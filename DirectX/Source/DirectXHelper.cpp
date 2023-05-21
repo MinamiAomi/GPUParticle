@@ -93,55 +93,45 @@ namespace DirectXHelper {
 #pragma endregion ディスクリプタヒープ
 #pragma region ルートシグネチャ
 	void RootSignatureDesc::AddDescriptorTable() {
-		D3D12_ROOT_PARAMETER rootParameter{
-			.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
-			.DescriptorTable{},
-			.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
-		};
-		rootParameters_.emplace_back(rootParameter);
 		ranges_.emplace_back();
+		auto& rootParameter = rootParameters_.emplace_back();
+		rootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+		rootParameter.DescriptorTable = {};
+		rootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	}
 
 	void RootSignatureDesc::AddDescriptor(DescriptorType type, uint32_t shaderRegister, uint32_t registerSpace) {
-		D3D12_ROOT_PARAMETER rootParameter{
-			.ParameterType = static_cast<D3D12_ROOT_PARAMETER_TYPE>(type),
-			.Descriptor{
-				.ShaderRegister = shaderRegister,
-				.RegisterSpace = registerSpace
-			},
-			.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
-		};
-		rootParameters_.emplace_back(rootParameter);
+		auto& rootParameter = rootParameters_.emplace_back();
+		rootParameter.ParameterType = static_cast<D3D12_ROOT_PARAMETER_TYPE>(type);
+		rootParameter.Descriptor.ShaderRegister = shaderRegister;
+		rootParameter.Descriptor.RegisterSpace = registerSpace;
+		rootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	}
 
 	void RootSignatureDesc::AddDescriptorRange(RangeType rangeType, uint32_t numDescriptors, uint32_t baseShaderRegister, uint32_t registerSpace, uint32_t offset) {
 		if (ranges_.empty()) {
 			AddDescriptorTable();
 		}
-		D3D12_DESCRIPTOR_RANGE descriptorRange{
-			.RangeType = static_cast<D3D12_DESCRIPTOR_RANGE_TYPE>(rangeType),
-			.NumDescriptors = numDescriptors,
-			.BaseShaderRegister = baseShaderRegister,
-			.RegisterSpace = registerSpace,
-			.OffsetInDescriptorsFromTableStart = offset
-		};
-		ranges_.back().emplace_back(descriptorRange);
+		auto& descriptorRange = ranges_.back().emplace_back();
+		descriptorRange.RangeType = static_cast<D3D12_DESCRIPTOR_RANGE_TYPE>(rangeType);
+		descriptorRange.NumDescriptors = numDescriptors;
+		descriptorRange.BaseShaderRegister = baseShaderRegister;
+		descriptorRange.RegisterSpace = registerSpace;
+		descriptorRange.OffsetInDescriptorsFromTableStart = offset;
 	}
 
 	void RootSignatureDesc::AddStaticSampler(uint32_t shaderRegister, uint32_t ragisterSpace, D3D12_FILTER filter, AddressMode addressU, AddressMode addressV, AddressMode addressW) {
-		D3D12_STATIC_SAMPLER_DESC staticSamplerDesc{
-			.Filter = filter,
-			.AddressU = static_cast<D3D12_TEXTURE_ADDRESS_MODE>(addressU),
-			.AddressV = static_cast<D3D12_TEXTURE_ADDRESS_MODE>(addressV),
-			.AddressW = static_cast<D3D12_TEXTURE_ADDRESS_MODE>(addressW),
-			.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER,
-			.MinLOD = 0.0f,
-			.MaxLOD = D3D12_FLOAT32_MAX,
-			.ShaderRegister = shaderRegister,
-			.RegisterSpace = ragisterSpace,
-			.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
-		};
-		staticSamplerDescs_.emplace_back(staticSamplerDesc);
+		auto& staticSamplerDesc = staticSamplerDescs_.emplace_back();
+		staticSamplerDesc.Filter = filter;
+		staticSamplerDesc.AddressU = static_cast<D3D12_TEXTURE_ADDRESS_MODE>(addressU);
+		staticSamplerDesc.AddressV = static_cast<D3D12_TEXTURE_ADDRESS_MODE>(addressV);		
+		staticSamplerDesc.AddressW = static_cast<D3D12_TEXTURE_ADDRESS_MODE>(addressW);
+		staticSamplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+		staticSamplerDesc.MinLOD = 0.0f;
+		staticSamplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
+		staticSamplerDesc.ShaderRegister = shaderRegister;
+		staticSamplerDesc.RegisterSpace = ragisterSpace;
+		staticSamplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	}
 
 	void RootSignatureDesc::AddFlags(D3D12_ROOT_SIGNATURE_FLAGS flags) {
@@ -194,6 +184,149 @@ namespace DirectXHelper {
 		rootSignature_->SetName(String::Convert(name).c_str());
 	}
 #pragma endregion ルートシグネチャ
+#pragma region パイプライン
+	void GraphicsPipelineStateDesc::SetRootSignature(ID3D12RootSignature* rootSignature) {
+		desc_.pRootSignature = rootSignature;
+	}
+
+	void GraphicsPipelineStateDesc::SetVertexShader(const void* shaderBytecode, SIZE_T bytecodeLength) {
+		desc_.VS.pShaderBytecode = shaderBytecode;
+		desc_.VS.BytecodeLength = bytecodeLength;
+	}
+
+	void GraphicsPipelineStateDesc::SetPixelShader(const void* shaderBytecode, SIZE_T bytecodeLength) {
+		desc_.PS.pShaderBytecode = shaderBytecode;
+		desc_.PS.BytecodeLength = bytecodeLength;
+	}
+
+	void GraphicsPipelineStateDesc::SetDomainShader(const void* shaderBytecode, SIZE_T bytecodeLength) {
+		desc_.DS.pShaderBytecode = shaderBytecode;
+		desc_.DS.BytecodeLength = bytecodeLength;
+	}
+
+	void GraphicsPipelineStateDesc::SetHullShader(const void* shaderBytecode, SIZE_T bytecodeLength) {
+		desc_.HS.pShaderBytecode = shaderBytecode;
+		desc_.HS.BytecodeLength = bytecodeLength;
+	}
+
+	void GraphicsPipelineStateDesc::SetGeometryShader(const void* shaderBytecode, SIZE_T bytecodeLength) {
+		desc_.GS.pShaderBytecode = shaderBytecode;
+		desc_.GS.BytecodeLength = bytecodeLength;
+	}
+
+	void GraphicsPipelineStateDesc::SetRasterizerState(FillMode fillMode, CullMode cullMode) {
+		auto& rs = desc_.RasterizerState;
+		rs.FillMode = static_cast<D3D12_FILL_MODE>(fillMode);
+		rs.CullMode = static_cast<D3D12_CULL_MODE>(cullMode);
+	}
+
+	void GraphicsPipelineStateDesc::AddInputElementVertex(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format) {
+		auto& inputElement = inputElements_.emplace_back();
+		// 一時バッファに保存
+		semanticNames.emplace_back(semanticName);
+		inputElement.SemanticName = semanticNames.back().c_str();
+		inputElement.SemanticIndex = semanticIndex;
+		inputElement.Format = format;
+		inputElement.InputSlot = 0;
+		inputElement.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		inputElement.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+		inputElement.InstanceDataStepRate = 0;
+	}
+
+	void GraphicsPipelineStateDesc::AddInputElementInstance(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t instanceDataStepRate) {
+		auto& inputElement = inputElements_.emplace_back();
+		semanticNames.emplace_back(semanticName);
+		inputElement.SemanticName = semanticNames.back().c_str();
+		inputElement.SemanticIndex = semanticIndex;
+		inputElement.Format = format;
+		inputElement.InputSlot = 0;
+		inputElement.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+		inputElement.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA;
+		inputElement.InstanceDataStepRate = instanceDataStepRate;
+	}
+
+	void GraphicsPipelineStateDesc::SetPrimitiveTopologyType(PrimitiveTopologyType primitiveTopologyType) {
+		desc_.PrimitiveTopologyType = static_cast<D3D12_PRIMITIVE_TOPOLOGY_TYPE>(primitiveTopologyType);
+	}
+
+	void GraphicsPipelineStateDesc::AddRenderTargetState(BlendMode blendMode, DXGI_FORMAT rtvFormat) {
+		assert(renderTargetCount_ < 8);
+		auto& rt = desc_.BlendState.RenderTarget[renderTargetCount_];
+		desc_.RTVFormats[renderTargetCount_] = rtvFormat;
+		++renderTargetCount_;
+
+		rt.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+		rt.BlendOpAlpha = D3D12_BLEND_OP_ADD;			// 加算
+		rt.SrcBlendAlpha = D3D12_BLEND_ONE;			// ソースの値を 100% 使う
+		rt.DestBlendAlpha = D3D12_BLEND_ZERO;			// デストの値を   0% 使う
+		rt.BlendEnable = true;						// ブレンドを有効にする
+
+		switch (blendMode)
+		{
+		case DirectXHelper::GraphicsPipelineStateDesc::BlendMode::None:
+			rt.BlendEnable = false;
+			return;
+		case DirectXHelper::GraphicsPipelineStateDesc::BlendMode::Normal:
+		default:
+			rt.BlendOp = D3D12_BLEND_OP_ADD;
+			rt.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+			rt.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	// 1.0f-ソースのアルファ値
+			return;
+		case DirectXHelper::GraphicsPipelineStateDesc::BlendMode::Add:
+			rt.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
+			rt.SrcBlend = D3D12_BLEND_ONE;				// ソースの値を 100% 使う
+			rt.DestBlend = D3D12_BLEND_ONE;				// デストの値を 100% 使う
+			return;
+		case DirectXHelper::GraphicsPipelineStateDesc::BlendMode::Subtract:
+			rt.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;	// デストからソースを減算
+			rt.SrcBlend = D3D12_BLEND_ONE;				// ソースの値を 100% 使う
+			rt.DestBlend = D3D12_BLEND_ONE;				// デストの値を 100% 使う
+			return;
+		case DirectXHelper::GraphicsPipelineStateDesc::BlendMode::Multiply:
+			rt.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
+			rt.SrcBlend = D3D12_BLEND_ZERO;				// 使わない
+			rt.DestBlend = D3D12_BLEND_SRC_COLOR;		// デストの値 × ソースの値
+			return;
+		case DirectXHelper::GraphicsPipelineStateDesc::BlendMode::Inverse:
+			rt.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
+			rt.SrcBlend = D3D12_BLEND_INV_DEST_COLOR;	// 1.0f-デストカラーの値
+			rt.DestBlend = D3D12_BLEND_ZERO;				// 使わない
+			return;
+		}
+	}
+
+	void GraphicsPipelineStateDesc::SetDepthState(DepthWriteMask depthWriteMask, ComparisonFunc comparisonFunc, DXGI_FORMAT dsvFormat) {
+		auto& dss = desc_.DepthStencilState;
+		dss.DepthEnable = true;
+		dss.DepthWriteMask = static_cast<D3D12_DEPTH_WRITE_MASK>(depthWriteMask);
+		dss.DepthFunc = static_cast<D3D12_COMPARISON_FUNC>(comparisonFunc);
+		desc_.DSVFormat = dsvFormat;
+	}
+
+	void GraphicsPipelineStateDesc::SetSampleState(uint32_t count, uint32_t quality) {
+		desc_.SampleDesc.Count = count;
+		desc_.SampleDesc.Quality = quality;
+	}
+
+	void PipelineState::Create(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, const std::string& name) {
+		assert(device);
+
+		CHECK_HRESULT(device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(pipelineState_.ReleaseAndGetAddressOf())));
+		pipelineState_->SetName(String::Convert(name).c_str());
+	}
+
+	void PipelineState::Create(ID3D12Device* device, GraphicsPipelineStateDesc& desc, const std::string& name) {
+		assert(device);
+
+		desc.desc_.NumRenderTargets = desc.renderTargetCount_;
+		desc.desc_.InputLayout.pInputElementDescs = desc.inputElements_.data();
+		desc.desc_.InputLayout.NumElements = static_cast<uint32_t>(desc.inputElements_.size());
+		desc.desc_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+
+		Create(device, desc.desc_, name);
+	}
+
+#pragma endregion パイプライン
 #pragma region 頂点バッファ
 	void VertexBuffer::Create(ID3D12Device* device, size_t vertexCount, size_t strideSize, const std::string& name) {
 		assert(device);

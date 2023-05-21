@@ -16,6 +16,15 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Externals">
+      <UniqueIdentifier>{9e184955-8dc8-4d10-b4ff-93d22e9da9c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals\imgui">
+      <UniqueIdentifier>{149d841e-35bf-4362-adbb-43f0ff24a315}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals\DirectX">
+      <UniqueIdentifier>{8072b7f1-6734-4fb1-852b-402f78b47a7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Debug.cpp">
@@ -40,6 +49,27 @@
     </ClCompile>
     <ClCompile Include="Source\DirectXDevice.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Externals\imgui\imgui.cpp">
+      <Filter>Externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Externals\imgui\imgui_demo.cpp">
+      <Filter>Externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Externals\imgui\imgui_draw.cpp">
+      <Filter>Externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Externals\imgui\imgui_impl_dx12.cpp">
+      <Filter>Externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Externals\imgui\imgui_impl_win32.cpp">
+      <Filter>Externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Externals\imgui\imgui_tables.cpp">
+      <Filter>Externals\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Externals\imgui\imgui_widgets.cpp">
+      <Filter>Externals\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,5 +98,51 @@
     <ClInclude Include="Include\DirectXDevice.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\Externals\imgui\imconfig.h">
+      <Filter>Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Externals\imgui\imgui.h">
+      <Filter>Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Externals\imgui\imgui_impl_dx12.h">
+      <Filter>Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Externals\imgui\imgui_impl_win32.h">
+      <Filter>Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Externals\imgui\imgui_internal.h">
+      <Filter>Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Externals\imgui\imstb_rectpack.h">
+      <Filter>Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Externals\imgui\imstb_textedit.h">
+      <Filter>Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Externals\imgui\imstb_truetype.h">
+      <Filter>Externals\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Externals\DirectX\d3dx12.h">
+      <Filter>Externals\DirectX</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Externals\imgui\LICENSE.txt">
+      <Filter>Externals\imgui</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\Shader\Particle.PS.hlsl">
+      <Filter>Resource\Shader</Filter>
+    </None>
+    <None Include="Resource\Shader\Particle.VS.hlsl">
+      <Filter>Resource\Shader</Filter>
+    </None>
+    <None Include="Resource\Shader\Particle.hlsli">
+      <Filter>Resource\Shader</Filter>
+    </None>
+    <None Include="Resource\Shader\Particle.GS.hlsl">
+      <Filter>Resource\Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

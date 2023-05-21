@@ -142,6 +142,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Externals\imgui\imgui.cpp" />
+    <ClCompile Include="..\Externals\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\Externals\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\Externals\imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="..\Externals\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\Externals\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\Externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Debug.cpp" />
     <ClCompile Include="Source\DirectXDevice.cpp" />
@@ -155,6 +162,15 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Externals\DirectX\d3dx12.h" />
+    <ClInclude Include="..\Externals\imgui\imconfig.h" />
+    <ClInclude Include="..\Externals\imgui\imgui.h" />
+    <ClInclude Include="..\Externals\imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="..\Externals\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="..\Externals\imgui\imgui_internal.h" />
+    <ClInclude Include="..\Externals\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\Externals\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\Externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Include\Debug.h" />
     <ClInclude Include="Include\DirectXDevice.h" />
     <ClInclude Include="Include\DirectXHelper.h" />
@@ -164,6 +180,36 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Include\Window.h" />
     <ClInclude Include="MathUtils_inline.h" />
     <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Externals\imgui\LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\Shader\Particle.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Resource\Shader\Particle.PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Resource\Shader\Particle.VS.hlsl">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\Shader\Particle.GS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
