@@ -38,6 +38,9 @@
     <ClCompile Include="Source\MathUtils.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\DirectXDevice.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Debug.h">
@@ -60,6 +63,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="MathUtils_inline.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\DirectXDevice.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

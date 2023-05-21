@@ -36,3 +36,5 @@
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
+
+#define DELETE_COPY_MOVE(C) C(C&) = delete; C& operator=(C&) = delete; C(C&&) = delete; C& operator=(C&&) = delete;

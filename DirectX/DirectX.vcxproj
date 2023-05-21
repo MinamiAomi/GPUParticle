@@ -144,6 +144,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Debug.cpp" />
+    <ClCompile Include="Source\DirectXDevice.cpp" />
     <ClCompile Include="Source\DirectXHelper.cpp" />
     <ClCompile Include="Source\MathUtils.cpp" />
     <ClCompile Include="Source\ShaderCompiler.cpp" />
@@ -155,6 +156,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Debug.h" />
+    <ClInclude Include="Include\DirectXDevice.h" />
     <ClInclude Include="Include\DirectXHelper.h" />
     <ClInclude Include="Include\MathUtils.h" />
     <ClInclude Include="Include\ShaderCompiler.h" />

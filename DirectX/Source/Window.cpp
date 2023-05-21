@@ -18,15 +18,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-Window* Window::GetInstance() {
-	static Window instance;
-	return &instance;
-}
-
 void Window::Create(const std::string& name, uint32_t clientWidth, uint32_t clientHeight) {
+	clientWidth_ = clientWidth;
+	clientHeight_ = clientHeight;
 
-	m_name = name;
-	auto wname = String::Convert(m_name);
+	name_ = name;
+	auto wname = String::Convert(name_);
 
 	// ウィンドウクラスを生成
 	WNDCLASS wc{};
@@ -48,7 +45,7 @@ void Window::Create(const std::string& name, uint32_t clientWidth, uint32_t clie
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 	// ウィンドウの生成
-	m_hwnd = CreateWindow(
+	hwnd_ = CreateWindow(
 		wc.lpszClassName,		// 利用するクラス名
 		wname.c_str(),				// タイトルバーの文字
 		WS_OVERLAPPEDWINDOW,	// よく見るウィンドウスタイル
@@ -63,12 +60,12 @@ void Window::Create(const std::string& name, uint32_t clientWidth, uint32_t clie
 }
 
 void Window::Show() {
-	ShowWindow(m_hwnd, SW_SHOW);
+	ShowWindow(hwnd_, SW_SHOW);
 #ifdef _DEBUG
-	Debug::Log(std::format("Show {} Window\n", m_name));
+	Debug::Log(std::format("Show {} Window\n", name_));
 #endif
 }
 
 void Window::Close() {
-	CloseWindow(m_hwnd);
+	CloseWindow(hwnd_);
 }
