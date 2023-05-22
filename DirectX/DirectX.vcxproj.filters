@@ -71,6 +71,9 @@
     <ClCompile Include="..\Externals\imgui\imgui_widgets.cpp">
       <Filter>Externals\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="ImGuiManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Debug.h">
@@ -125,6 +128,9 @@
     <ClInclude Include="..\Externals\DirectX\d3dx12.h">
       <Filter>Externals\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="ImGuiManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Externals\imgui\LICENSE.txt">
@@ -142,6 +148,9 @@
       <Filter>Resource\Shader</Filter>
     </None>
     <None Include="Resource\Shader\Particle.GS.hlsl">
+      <Filter>Resource\Shader</Filter>
+    </None>
+    <None Include="Resource\Shader\ParticleUpdate.CS.hlsl">
       <Filter>Resource\Shader</Filter>
     </None>
   </ItemGroup>

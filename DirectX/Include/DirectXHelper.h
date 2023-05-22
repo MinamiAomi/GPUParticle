@@ -213,8 +213,8 @@ namespace DirectXHelper {
 		void SetHullShader(const void* shaderBytecode, SIZE_T bytecodeLength);
 		void SetGeometryShader(const void* shaderBytecode, SIZE_T bytecodeLength);
 		void SetRasterizerState(FillMode fillMode, CullMode cullMode);
-		void AddInputElementVertex(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format);
-		void AddInputElementInstance(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t instanceDataStepRate);
+		void AddInputElementVertex(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t inputSlot);
+		void AddInputElementInstance(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t inputSlot, uint32_t instanceDataStepRate);
 		void SetPrimitiveTopologyType(PrimitiveTopologyType primitiveTopologyType);
 		void AddRenderTargetState(BlendMode blendMode, DXGI_FORMAT rtvFormat);
 		void SetDepthState(DepthWriteMask depthWriteMask, ComparisonFunc comparisonFunc, DXGI_FORMAT dsvFormat);
@@ -229,13 +229,27 @@ namespace DirectXHelper {
 		friend class PipelineState;
 	};
 
+	class ComputePipelineStateDesc {
+	public:
+		void SetRootSignature(ID3D12RootSignature* rootSignature);
+		void SeComputeShader(const void* shaderBytecode, SIZE_T bytecodeLength);
+
+	private:
+		D3D12_COMPUTE_PIPELINE_STATE_DESC desc_{};
+
+		friend class PipelineState;
+	};
+
 	class PipelineState {
 	public:
 		PipelineState() = default;
 		DELETE_COPY_MOVE(PipelineState);
 
-		void Create(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, const std::string& name = "PipelineState");
-		void Create(ID3D12Device* device, GraphicsPipelineStateDesc& desc, const std::string& name = "PipelineState");
+		void Create(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, const std::string& name = "GraphicsPipelineState");
+		void Create(ID3D12Device* device, GraphicsPipelineStateDesc& desc, const std::string& name = "GraphicsPipelineState");
+		void Create(ID3D12Device* device, const D3D12_COMPUTE_PIPELINE_STATE_DESC& desc, const std::string& name = "ComputePipelineState");
+		void Create(ID3D12Device* device, ComputePipelineStateDesc& desc, const std::string& name = "ComputePipelineState");
+
 
 		ID3D12PipelineState* Get() const { return pipelineState_.Get(); }
 		ComPtr<ID3D12PipelineState> GetComPtr() const { return pipelineState_; }

@@ -45,11 +45,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		psDesc.SetVertexShader(vs->GetBufferPointer(), vs->GetBufferSize());
 		psDesc.SetPixelShader(ps->GetBufferPointer(), ps->GetBufferSize());
 		psDesc.SetGeometryShader(gs->GetBufferPointer(), gs->GetBufferSize());
-		psDesc.AddInputElementVertex("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		psDesc.AddInputElementVertex("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0);
 		psDesc.SetRasterizerState(FillMode::Solid, CullMode::Back);
 		psDesc.SetPrimitiveTopologyType(PrimitiveTopologyType::Point);
-		psDesc.AddRenderTargetState(BlendMode::Normal, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-		psDesc.SetDepthState(DepthWriteMask::All, ComparisonFunc::LessEqual, DXGI_FORMAT_D24_UNORM_S8_UINT);
+		psDesc.AddRenderTargetState(BlendMode::Add, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 		psDesc.SetSampleState(1, 0);
 		pso.Create(directXDevice.GetDevice(), psDesc);
 	}
@@ -64,11 +63,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	TransformCB transform;
 	{
 		std::vector<Vector4> vertices{
-		{  0.0f,  0.5f, 0.0f, 1.0f },
-		{  0.5f, -0.5f, 0.0f, 1.0f },
-		{ -0.5f, -0.5f, 0.0f, 1.0f },
+			{ -0.5f,  0.5f,  0.5f, 1.0f },
+			{  0.5f,  0.5f,  0.5f, 1.0f },
+			{ -0.5f, -0.5f,  0.5f, 1.0f },
+			{  0.5f, -0.5f,  0.5f, 1.0f },
+			{ -0.5f,  0.5f, -0.5f, 1.0f },
+			{  0.5f,  0.5f, -0.5f, 1.0f },
+			{ -0.5f, -0.5f, -0.5f, 1.0f },
+			{  0.5f, -0.5f, -0.5f, 1.0f },
 		};
-		vb.Create(directXDevice.GetDevice(), vertices.size(), sizeof(Vector4));
+		vb.Create(directXDevice.GetDevice(), vertices.size(), sizeof(vertices[0]));
 		vb.WriteData(vertices.data());
 
 		cb.Create(directXDevice.GetDevice(), sizeof(transform));
@@ -76,7 +80,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		transform.projectionMatrix = Matrix44::MakePerspectiveProjection(ToRad(45.0f), aspect, 0.01f, 100.0f);
 	}
 
-	float rot = 0;
+	float scale = 0;
+	float rotate = 0;
 
 	// メインループ
 	MSG msg{};
@@ -87,19 +92,20 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 		else {
 			directXDevice.StertScreenRendering();
-			
+
 			// 更新
 			{
-				rot += ToRad(1.0f);
-				transform.worldMatrix = Matrix44::MakeAffine(Vector3{ 2.0f }, Vector3{ 0.0f, rot, 0.0f }, { 0.0f,0.0f,5.0f });
+				scale += 0.001f;
+				rotate += ToRad(1.0f);
+				transform.worldMatrix = Matrix44::MakeAffine(Vector3{ scale }, Vector3{ rotate, rotate, rotate }, { 0.0f,0.0f,5.0f });
 				transform.viewMatrix = Inverse(Matrix44::MakeAffine(Vector3{ 1.0f }, Vector3{ 0.0f }, { 0.0f,0.0f,-5.0f }));
 				cb.WriteData(&transform);
 			}
-			
+
 			// 描画
 			{
 				auto cmdList = directXDevice.GetCommnadList();
-				
+
 				cmdList->SetGraphicsRootSignature(rs.Get());
 				cmdList->SetPipelineState(pso.Get());
 				cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);

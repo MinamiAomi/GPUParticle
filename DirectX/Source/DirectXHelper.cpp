@@ -220,26 +220,26 @@ namespace DirectXHelper {
 		rs.CullMode = static_cast<D3D12_CULL_MODE>(cullMode);
 	}
 
-	void GraphicsPipelineStateDesc::AddInputElementVertex(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format) {
+	void GraphicsPipelineStateDesc::AddInputElementVertex(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t inputSlot) {
 		auto& inputElement = inputElements_.emplace_back();
 		// 一時バッファに保存
 		semanticNames.emplace_back(semanticName);
 		inputElement.SemanticName = semanticNames.back().c_str();
 		inputElement.SemanticIndex = semanticIndex;
 		inputElement.Format = format;
-		inputElement.InputSlot = 0;
+		inputElement.InputSlot = inputSlot;
 		inputElement.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 		inputElement.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
 		inputElement.InstanceDataStepRate = 0;
 	}
 
-	void GraphicsPipelineStateDesc::AddInputElementInstance(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t instanceDataStepRate) {
+	void GraphicsPipelineStateDesc::AddInputElementInstance(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t inputSlot, uint32_t instanceDataStepRate) {
 		auto& inputElement = inputElements_.emplace_back();
 		semanticNames.emplace_back(semanticName);
 		inputElement.SemanticName = semanticNames.back().c_str();
 		inputElement.SemanticIndex = semanticIndex;
 		inputElement.Format = format;
-		inputElement.InputSlot = 0;
+		inputElement.InputSlot = inputSlot;
 		inputElement.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 		inputElement.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA;
 		inputElement.InstanceDataStepRate = instanceDataStepRate;
@@ -274,12 +274,12 @@ namespace DirectXHelper {
 			return;
 		case DirectXHelper::GraphicsPipelineStateDesc::BlendMode::Add:
 			rt.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
-			rt.SrcBlend = D3D12_BLEND_ONE;				// ソースの値を 100% 使う
+			rt.SrcBlend = D3D12_BLEND_SRC_ALPHA;				// ソースの値を 100% 使う
 			rt.DestBlend = D3D12_BLEND_ONE;				// デストの値を 100% 使う
 			return;
 		case DirectXHelper::GraphicsPipelineStateDesc::BlendMode::Subtract:
 			rt.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;	// デストからソースを減算
-			rt.SrcBlend = D3D12_BLEND_ONE;				// ソースの値を 100% 使う
+			rt.SrcBlend = D3D12_BLEND_SRC_ALPHA;				// ソースの値を 100% 使う
 			rt.DestBlend = D3D12_BLEND_ONE;				// デストの値を 100% 使う
 			return;
 		case DirectXHelper::GraphicsPipelineStateDesc::BlendMode::Multiply:
@@ -308,6 +308,15 @@ namespace DirectXHelper {
 		desc_.SampleDesc.Quality = quality;
 	}
 
+	void ComputePipelineStateDesc::SetRootSignature(ID3D12RootSignature* rootSignature)	{
+		desc_.pRootSignature = rootSignature;
+	}
+	
+	void ComputePipelineStateDesc::SeComputeShader(const void* shaderBytecode, SIZE_T bytecodeLength) {
+		desc_.CS.pShaderBytecode = shaderBytecode;
+		desc_.CS.BytecodeLength = bytecodeLength;
+	}
+
 	void PipelineState::Create(ID3D12Device* device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc, const std::string& name) {
 		assert(device);
 
@@ -323,6 +332,19 @@ namespace DirectXHelper {
 		desc.desc_.InputLayout.NumElements = static_cast<uint32_t>(desc.inputElements_.size());
 		desc.desc_.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
 
+		Create(device, desc.desc_, name);
+	}
+
+	void PipelineState::Create(ID3D12Device* device, const D3D12_COMPUTE_PIPELINE_STATE_DESC& desc, const std::string& name) {
+		assert(device);
+
+		CHECK_HRESULT(device->CreateComputePipelineState(&desc, IID_PPV_ARGS(pipelineState_.ReleaseAndGetAddressOf())));
+		pipelineState_->SetName(String::Convert(name).c_str());
+	}
+
+	void PipelineState::Create(ID3D12Device* device, ComputePipelineStateDesc& desc, const std::string& name) {
+		assert(device);
+		
 		Create(device, desc.desc_, name);
 	}
 
