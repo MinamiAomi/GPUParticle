@@ -10,6 +10,6 @@ struct VertexShaderOutput {
 
 VertexShaderOutput main(VertexShaderInput input) {
 	VertexShaderOutput output;
-	output.position = mul(input.position, mul(g_transformCB.worldMatrix, g_transformCB.viewMatrix));
+	output.position = mul(input.position, g_transformCB.viewMatrix);
 	return output;
 }

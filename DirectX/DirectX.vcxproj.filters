@@ -153,5 +153,8 @@
     <None Include="Resource\Shader\ParticleUpdate.CS.hlsl">
       <Filter>Resource\Shader</Filter>
     </None>
+    <None Include="Resource\Shader\ParticleInitalize.CS.hlsl">
+      <Filter>Resource\Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -59,6 +59,9 @@ void DirectXDevice::StertScreenRendering() {
 		.bottom = static_cast<LONG>(swapChainHeight_)
 	};
 	commandList_->RSSetScissorRects(1, &scissorRect);
+
+	ID3D12DescriptorHeap* ppHeaps[] = { commonHeap_.Get() };
+	commandList_->SetDescriptorHeaps(1, ppHeaps);
 }
 
 void DirectXDevice::FinishScreenRendering() {
@@ -202,7 +205,7 @@ void DirectXDevice::CreateCommands() {
 void DirectXDevice::CreateDescriptorHeap() {
 	rtvHeap_.Initalize(device_.Get(), kRTVDescriptorMaxCount, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, false, "RTV Descriptor Hrap");
 	dsvHeap_.Initalize(device_.Get(), kDSVDescriptorMaxCount, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, false, "DSV Descriptor Hrap");
-	commonHeap_.Initalize(device_.Get(), kCommonDescriptorMaxCount, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, false, "Common Descriptor Hrap");
+	commonHeap_.Initalize(device_.Get(), kCommonDescriptorMaxCount, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, true, "Common Descriptor Hrap");
 }
 
 void DirectXDevice::CreateSwapChain() {

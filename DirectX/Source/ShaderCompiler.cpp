@@ -58,9 +58,9 @@ ComPtr<IDxcBlob> ShaderCompiler::InternalCompile(const std::wstring& fileName, c
 		includeHandler_.Get(),
 		IID_PPV_ARGS(&shaderResult)));
 
-	ComPtr<IDxcBlobUtf8> shaderError = nullptr;
+	ComPtr<IDxcBlobUtf8> shaderError;
 	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), nullptr);
-	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+	if (shaderError&& shaderError->GetStringLength() != 0) {
 		Debug::Log(shaderError->GetStringPointer());
 		assert(false);
 	}

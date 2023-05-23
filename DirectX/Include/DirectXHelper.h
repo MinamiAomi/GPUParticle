@@ -42,6 +42,7 @@ namespace DirectXHelper {
 	void WriteToBuffer(ID3D12Resource* buffer, size_t byteSize, void* source);
 
 	uint64_t Align(uint64_t value, uint64_t alignment);
+	uint32_t Align(uint32_t value, uint32_t alignment);
 
 
 #pragma region ディスクリプタヒープ
@@ -161,6 +162,7 @@ namespace DirectXHelper {
 	};
 #pragma endregion ルートシグネチャ
 #pragma region パイプライン
+
 	class GraphicsPipelineStateDesc {
 	public:
 		// ブレンドモード
@@ -259,8 +261,28 @@ namespace DirectXHelper {
 	};
 
 #pragma endregion パイプライン
+#pragma region GPUリソース
+	class GPUResource {
+	public:
+		GPUResource() = default;
+		DELETE_COPY_MOVE(GPUResource);
+		void Create(ID3D12Device* device,
+			const D3D12_HEAP_PROPERTIES& heapProperties,
+			const D3D12_RESOURCE_DESC& resourceDesc,
+			D3D12_RESOURCE_STATES initialResourceState,
+			const std::string& name);
+
+		bool IsEnabled() const { return gpuResource_; }
+		ID3D12Resource* Get() const { return gpuResource_.Get(); }
+		ComPtr<ID3D12Resource> GetComPtr() const { return gpuResource_; }
+		D3D12_GPU_VIRTUAL_ADDRESS  GetGPUAddress() const { return gpuResource_->GetGPUVirtualAddress(); }
+
+	protected:
+		ComPtr<ID3D12Resource> gpuResource_;
+	};
+#pragma endregion GPUリソース
 #pragma region 頂点バッファ
-	class VertexBuffer {
+	class VertexBuffer : public GPUResource {
 	public:
 		VertexBuffer() = default;
 		DELETE_COPY_MOVE(VertexBuffer);
@@ -272,7 +294,7 @@ namespace DirectXHelper {
 		/// <param name="vertexCount">頂点数</param>
 		/// <param name="strideSize">頂点のバイトサイズ</param>
 		/// <param name="name">頂点バッファの名前（デバック用）</param>
-		void Create(ID3D12Device* device, size_t vertexCount, size_t strideSize, const std::string& name = "VertexBuffer");
+		void Create(ID3D12Device* device, uint32_t vertexCount, uint32_t strideSize, const std::string& name = "VertexBuffer");
 		/// <summary>
 		/// 頂点を書き込む
 		/// </summary>
@@ -288,24 +310,22 @@ namespace DirectXHelper {
 			WriteData(static_cast<const void*>(vertices.data()));
 		}
 
-		bool IsEnabled() const { return buffer_; }
-		ID3D12Resource* Get() const { return buffer_.Get(); }
-		ComPtr<ID3D12Resource> GetComPtr() const { return buffer_; }
-		D3D12_GPU_VIRTUAL_ADDRESS  GetGPUAddress() const { return buffer_->GetGPUVirtualAddress(); }
-		const D3D12_VERTEX_BUFFER_VIEW& GetView() const { return bufferView_; }
-		uint32_t GetByteSize() const { return  bufferView_.SizeInBytes; }
-		uint32_t GetStrideSize() const { return  bufferView_.StrideInBytes; }
+		uint32_t GetBufferSize() const { return  vertexCount_ * strideSize_; }
+		uint32_t GetStrideSize() const { return  strideSize_; }
 		uint32_t GetVertexCount() const { return vertexCount_; }
+		D3D12_VERTEX_BUFFER_VIEW GetView() const { return { GetGPUAddress(), GetBufferSize(), strideSize_ }; }
 
 	private:
-		ComPtr<ID3D12Resource> buffer_;
-		D3D12_VERTEX_BUFFER_VIEW bufferView_{};
-		uint32_t vertexCount_ = 0;
+		uint32_t vertexCount_{ 0 };
+		uint32_t strideSize_{ 0 };
 	};
 #pragma endregion 頂点バッファ
 #pragma region インデックスバッファ
-	class IndexBuffer {
+	using Index = uint16_t;
+	class IndexBuffer : public GPUResource {
 	public:
+		static const uint32_t kStrideSize = sizeof(Index);
+
 		IndexBuffer() = default;
 		DELETE_COPY_MOVE(IndexBuffer);
 		/// <summary>
@@ -315,50 +335,59 @@ namespace DirectXHelper {
 		/// <param name="device">デバイス</param>
 		/// <param name="indexCount">インデックス数</param>
 		/// <param name="name">インデックスバッファの名前（デバック用）</param>
-		void Create(ID3D12Device* device, size_t indexCount, const std::string& name = "IndexBuffer");
+		void Create(ID3D12Device* device, uint32_t indexCount, const std::string& name = "IndexBuffer");
 		/// <summary>
 		/// インデックスを書き込む
 		/// </summary>
 		/// <param name="indices">インデックス</param>
-		void WriteData(const uint16_t* indices);
+		void WriteData(const Index* indices);
 
-		bool IsEnabled() const { return buffer_; }
-		ID3D12Resource* Get() const { return buffer_.Get(); }
-		ComPtr<ID3D12Resource> GetComPtr() const { return buffer_; }
-		D3D12_GPU_VIRTUAL_ADDRESS  GetGPUAddress() const { return buffer_->GetGPUVirtualAddress(); }
-		const D3D12_INDEX_BUFFER_VIEW& GetView() const { return bufferView_; }
-		uint32_t GetByteSize() const { return  bufferView_.SizeInBytes; }
-		DXGI_FORMAT GetFormat() const { return  bufferView_.Format; }
+		uint32_t GetBufferSize() const { return  kStrideSize * indexCount_; }
 		uint32_t GetIndexCount() const { return indexCount_; }
+		D3D12_INDEX_BUFFER_VIEW GetView() const { return { GetGPUAddress(), GetBufferSize(), DXGI_FORMAT_R16_UINT }; }
 
 	private:
-		ComPtr<ID3D12Resource> buffer_;
-		D3D12_INDEX_BUFFER_VIEW bufferView_{};
-		uint32_t indexCount_ = 0;
+		uint32_t indexCount_{ 0 };
 	};
 #pragma endregion インデックスバッファ
 #pragma region 定数バッファ
-	class ConstantBuffer {
+	class ConstantBuffer : public GPUResource {
 	public:
 		ConstantBuffer() = default;
 		DELETE_COPY_MOVE(ConstantBuffer);
 		~ConstantBuffer();
-		void Create(ID3D12Device* device, size_t size, const std::string& name = "ConstantBuffer");
+		void Create(ID3D12Device* device, uint32_t dataSize, const std::string& name = "ConstantBuffer");
 		void WriteData(void* data);
 
-		bool IsEnabled() const { return buffer_; }
-		ID3D12Resource* Get() const { return buffer_.Get(); }
-		ComPtr<ID3D12Resource> GetComPtr() const { return buffer_; }
-		D3D12_GPU_VIRTUAL_ADDRESS GetGPUAddress() const { return buffer_->GetGPUVirtualAddress(); }
-		uint32_t GetAlignedSize() const { return alignedSize_; }
+		void* GetMapPtr() const { return mapPtr_; }
+		uint32_t GetBufferSize() const { return bufferSize_; }
 		uint32_t GetDataSize() const { return dataSize_; }
 
 	private:
-		ComPtr<ID3D12Resource> buffer_;
-		void* mapPtr_ = nullptr;
-		uint32_t alignedSize_ = 0;
-		uint32_t dataSize_ = 0;
+		void* mapPtr_{ nullptr };
+		uint32_t bufferSize_{ 0 };
+		uint32_t dataSize_{ 0 };
 	};
 #pragma endregion 定数バッファ
+#pragma region 構造化バッファ
+	class StructuredBuffer : public GPUResource {
+	public:
+		StructuredBuffer() = default;
+		DELETE_COPY_MOVE(StructuredBuffer);
+		~StructuredBuffer();
+		void Create(ID3D12Device* device, uint32_t elementSize, uint32_t elementCount, const std::string& name = "StructuredBuffer");
+		void WriteData(void* data);
+
+		void* GetMapPtr() const { return mapPtr_; }
+		uint32_t GetBufferSize() const { return elementCount_ * elementSize_; }
+		uint32_t GetElementCount() const { return elementCount_; }
+		uint32_t GetElementSize() const { return elementSize_; }
+
+	private:
+		void* mapPtr_{ nullptr };
+		uint32_t elementCount_{ 0 };
+		uint32_t elementSize_{ 0 };
+	};
+#pragma endregion 構造化バッファ
 };
 

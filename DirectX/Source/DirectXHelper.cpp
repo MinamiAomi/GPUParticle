@@ -1,5 +1,6 @@
 #include "DirectXHelper.h"
 #include "StringUtils.h"
+#include "Debug.h"
 
 namespace DirectXHelper {
 
@@ -31,6 +32,9 @@ namespace DirectXHelper {
 	}
 
 	uint64_t Align(uint64_t value, uint64_t alignment) {
+		return (value + alignment - 1) & ~(alignment - 1);
+	};
+	uint32_t Align(uint32_t value, uint32_t alignment) {
 		return (value + alignment - 1) & ~(alignment - 1);
 	};
 
@@ -109,6 +113,7 @@ namespace DirectXHelper {
 	}
 
 	void RootSignatureDesc::AddDescriptorRange(RangeType rangeType, uint32_t numDescriptors, uint32_t baseShaderRegister, uint32_t registerSpace, uint32_t offset) {
+		assert(numDescriptors > 0);
 		if (ranges_.empty()) {
 			AddDescriptorTable();
 		}
@@ -170,11 +175,15 @@ namespace DirectXHelper {
 		ComPtr<ID3DBlob> blob;
 		ComPtr<ID3DBlob> errorBlob;
 
-		CHECK_HRESULT(D3D12SerializeRootSignature(
+		HRESULT hr = D3D12SerializeRootSignature(
 			&desc,
 			D3D_ROOT_SIGNATURE_VERSION_1,
 			blob.GetAddressOf(),
-			errorBlob.GetAddressOf()));
+			errorBlob.GetAddressOf());
+		if (FAILED(hr)) {
+			Debug::Log(static_cast<char*>(errorBlob->GetBufferPointer()));
+			assert(false);
+		}
 
 		CHECK_HRESULT(device->CreateRootSignature(
 			0,
@@ -349,105 +358,122 @@ namespace DirectXHelper {
 	}
 
 #pragma endregion パイプライン
-#pragma region 頂点バッファ
-	void VertexBuffer::Create(ID3D12Device* device, size_t vertexCount, size_t strideSize, const std::string& name) {
+#pragma region GPUリソース
+	void GPUResource::Create(ID3D12Device* device, const D3D12_HEAP_PROPERTIES& heapProperties, const D3D12_RESOURCE_DESC& resourceDesc, D3D12_RESOURCE_STATES initialResourceState, const std::string& name) {
 		assert(device);
-
-		vertexCount_ = static_cast<uint32_t>(vertexCount);
-		bufferView_.StrideInBytes = static_cast<uint32_t>(strideSize);
-		bufferView_.SizeInBytes = bufferView_.StrideInBytes * vertexCount_;
-
-		auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(static_cast<uint64_t>(bufferView_.SizeInBytes));
-
 		CHECK_HRESULT(device->CreateCommittedResource(
 			&heapProperties,
 			D3D12_HEAP_FLAG_NONE,
 			&resourceDesc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
+			initialResourceState,
 			nullptr,
-			IID_PPV_ARGS(buffer_.ReleaseAndGetAddressOf())));
-		buffer_->SetName(String::Convert(name).c_str());
+			IID_PPV_ARGS(gpuResource_.ReleaseAndGetAddressOf())));
+		gpuResource_->SetName(String::Convert(name).c_str());
 
-		bufferView_.BufferLocation = buffer_->GetGPUVirtualAddress();
+	}
+#pragma endregion GPUリソース
+#pragma region 頂点バッファ
+	void VertexBuffer::Create(ID3D12Device* device, uint32_t vertexCount, uint32_t strideSize, const std::string& name) {
+		assert(device);
+
+		vertexCount_ = vertexCount;
+		strideSize_ = strideSize;
+		auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(static_cast<uint64_t>(GetBufferSize()));
+		GPUResource::Create(device, heapProperties, resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, name);
 	}
 
 	void VertexBuffer::WriteData(const void* vertices) {
-		assert(buffer_);
+		assert(IsEnabled());
 		void* map = nullptr;
-		CHECK_HRESULT(buffer_->Map(0, nullptr, &map));
-		memcpy(map, vertices, bufferView_.SizeInBytes);
-		buffer_->Unmap(0, nullptr);
+		CHECK_HRESULT(gpuResource_->Map(0, nullptr, &map));
+		memcpy(map, vertices, GetBufferSize());
+		gpuResource_->Unmap(0, nullptr);
 		map = nullptr;
 	}
 #pragma endregion 頂点バッファ
 #pragma region インデックスバッファ
-	void IndexBuffer::Create(ID3D12Device* device, size_t indexCount, const std::string& name) {
+	void IndexBuffer::Create(ID3D12Device* device, uint32_t indexCount, const std::string& name) {
 		assert(device);
 
-		indexCount_ = static_cast<uint32_t>(indexCount);
-		bufferView_.Format = DXGI_FORMAT_R16_UINT;
-		bufferView_.SizeInBytes = static_cast<uint32_t>(sizeof(uint16_t)) * indexCount_;
-
+		indexCount_ = indexCount;
 		auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(static_cast<uint64_t>(bufferView_.SizeInBytes));
-
-		CHECK_HRESULT(device->CreateCommittedResource(
-			&heapProperties,
-			D3D12_HEAP_FLAG_NONE,
-			&resourceDesc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(buffer_.ReleaseAndGetAddressOf())));
-		buffer_->SetName(String::Convert(name).c_str());
-
-		bufferView_.BufferLocation = buffer_->GetGPUVirtualAddress();
+		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(static_cast<uint64_t>(GetBufferSize()));
+		GPUResource::Create(device, heapProperties, resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, name);
 	}
 
-	void IndexBuffer::WriteData(const uint16_t* indices) {
-		assert(buffer_);
+	void IndexBuffer::WriteData(const Index* indices) {
+		assert(IsEnabled());
 		void* map = nullptr;
-		CHECK_HRESULT(buffer_->Map(0, nullptr, &map));
-		memcpy(map, indices, bufferView_.SizeInBytes);
-		buffer_->Unmap(0, nullptr);
+		CHECK_HRESULT(gpuResource_->Map(0, nullptr, &map));
+		memcpy(map, indices, GetBufferSize());
+		gpuResource_->Unmap(0, nullptr);
 		map = nullptr;
 	}
 #pragma endregion インデックスバッファ
 #pragma region 定数バッファ
 	ConstantBuffer::~ConstantBuffer() {
 		if (mapPtr_) {
-			buffer_->Unmap(0, nullptr);
+			gpuResource_->Unmap(0, nullptr);
 			mapPtr_ = nullptr;
 		}
 	}
-	void ConstantBuffer::Create(ID3D12Device* device, size_t size, const std::string& name) {
+	void ConstantBuffer::Create(ID3D12Device* device, uint32_t dataSize, const std::string& name) {
 		assert(device);
 
 		if (mapPtr_) {
-			buffer_->Unmap(0, nullptr);
+			gpuResource_->Unmap(0, nullptr);
 			mapPtr_ = nullptr;
 		}
 		
-		dataSize_ = static_cast<uint32_t>(size);
-		alignedSize_ = static_cast<uint32_t>(Align(size, 256));
+		dataSize_ = dataSize;
+		bufferSize_ = Align(dataSize_, 256);
 
 		auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(alignedSize_);
+		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize_);
+		GPUResource::Create(device, heapProperties, resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, name);
 		
-		CHECK_HRESULT(device->CreateCommittedResource(
-			&heapProperties,
-			D3D12_HEAP_FLAG_NONE,
-			&resourceDesc,
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(buffer_.ReleaseAndGetAddressOf())));
-		buffer_->SetName(String::Convert(name).c_str());
-		
-		CHECK_HRESULT(buffer_->Map(0, nullptr, &mapPtr_));
-		memset(mapPtr_, 0, alignedSize_);
+		CHECK_HRESULT(gpuResource_->Map(0, nullptr, &mapPtr_));
+		memset(mapPtr_, 0, bufferSize_);
 	}
 	void ConstantBuffer::WriteData(void* data) {
+		assert(IsEnabled());
+		assert(mapPtr_);
 		memcpy(mapPtr_, data, dataSize_);
 	}
 #pragma endregion 定数バッファ
+#pragma region 構造化バッファ
+
+	StructuredBuffer::~StructuredBuffer() {
+		if (mapPtr_) {
+			gpuResource_->Unmap(0, nullptr);
+			mapPtr_ = nullptr;
+		}
+	}
+
+	void StructuredBuffer::Create(ID3D12Device* device, uint32_t elementSize, uint32_t elementCount, const std::string& name) {
+		assert(device);
+
+		if (mapPtr_) {
+			gpuResource_->Unmap(0, nullptr);
+			mapPtr_ = nullptr;
+		}
+
+		elementSize_ = elementSize;
+		elementCount_ = elementCount;
+
+		auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(static_cast<uint64_t>(GetBufferSize()));
+		GPUResource::Create(device, heapProperties, resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, name);
+
+		CHECK_HRESULT(gpuResource_->Map(0, nullptr, &mapPtr_));
+		memset(mapPtr_, 0, static_cast<uint64_t>(GetBufferSize()));
+	}
+
+	void StructuredBuffer::WriteData(void* data) {
+		memcpy(mapPtr_, data, static_cast<uint64_t>(GetBufferSize()));
+	}
+
+#pragma endregion 構造化バッファ
+
 };
