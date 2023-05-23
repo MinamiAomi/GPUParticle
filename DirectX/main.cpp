@@ -17,8 +17,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	window.Show();
 	
-	DirectXHelper::GPUResource rwsb;
-	DirectXHelper::Descriptor uav;
+	DirectXHelper::GPUResource particlesBuffer;
+	DirectXHelper::Descriptor particlesBufferView;
 	DirectXHelper::ConstantBuffer targetCB;
 	static const uint32_t kParticleCount = 10;
 	struct TargetCB {
@@ -34,13 +34,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(Particle) * kParticleCount);
 		resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-		rwsb.Create(directXDevice.GetDevice(), heapProperties, resourceDesc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, "ParticleBuffer");
-		uav = directXDevice.GetCommonHeap().Allocate();
+		particlesBuffer.Create(directXDevice.GetDevice(), heapProperties, resourceDesc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, "ParticleBuffer");
+		particlesBufferView = directXDevice.GetCommonHeap().Allocate();
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
 		uavDesc.Buffer.NumElements = kParticleCount;
 		uavDesc.Buffer.StructureByteStride = sizeof(Particle);
-		directXDevice.GetDevice()->CreateUnorderedAccessView(rwsb.Get(), nullptr, &uavDesc, uav.cpu);
+		directXDevice.GetDevice()->CreateUnorderedAccessView(particlesBuffer.Get(), nullptr, &uavDesc, particlesBufferView.cpu);
 
 		target.target = { 0.0f,0.0f,20.0f };
 		targetCB.Create(directXDevice.GetDevice(), sizeof(TargetCB));
@@ -68,11 +68,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		cmdList->SetDescriptorHeaps(1, ppHeaps);
 		cmdList->SetComputeRootSignature(crs.Get());
 		cmdList->SetPipelineState(cpso.Get());
-		cmdList->SetComputeRootDescriptorTable(0, uav.gpu);
+		cmdList->SetComputeRootDescriptorTable(0, particlesBufferView.gpu);
 		cmdList->Dispatch(kParticleCount, 1, 1);
 		D3D12_RESOURCE_BARRIER barriers[] = {
-			CD3DX12_RESOURCE_BARRIER::UAV(rwsb.Get()),
-			CD3DX12_RESOURCE_BARRIER::Transition(rwsb.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_GENERIC_READ)
+			CD3DX12_RESOURCE_BARRIER::UAV(particlesBuffer.Get()),
+			CD3DX12_RESOURCE_BARRIER::Transition(particlesBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_GENERIC_READ)
 		};
 		cmdList->ResourceBarrier(_countof(barriers), barriers);
 		directXDevice.SubmitCommandList();
@@ -112,9 +112,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		rsDesc.AddFlags(D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 		rs.Create(directXDevice.GetDevice(), rsDesc);
 
-		auto vs = ShaderCompiler::Compile(L"Resource/Shader/Particle.VS.hlsl", L"main", L"vs_6_0");
-		auto ps = ShaderCompiler::Compile(L"Resource/Shader/Particle.PS.hlsl", L"main", L"ps_6_0");
-		auto gs = ShaderCompiler::Compile(L"Resource/Shader/Particle.GS.hlsl", L"main", L"gs_6_0");
+		auto vs = ShaderCompiler::Compile(L"Resource/Shader/ParticleGraphics_VS.hlsl", L"main", L"vs_6_0");
+		auto ps = ShaderCompiler::Compile(L"Resource/Shader/ParticleGraphics_PS.hlsl", L"main", L"ps_6_0");
+		auto gs = ShaderCompiler::Compile(L"Resource/Shader/ParticleGraphics_GS.hlsl", L"main", L"gs_6_0");
 
 
 		DirectXHelper::GraphicsPipelineStateDesc psDesc;
@@ -133,7 +133,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 	D3D12_VERTEX_BUFFER_VIEW vbv{};
-	vbv.BufferLocation = rwsb.GetGPUAddress();
+	vbv.BufferLocation = particlesBuffer.GetGPUAddress();
 	vbv.SizeInBytes = sizeof(Particle) * kParticleCount;
 	vbv.StrideInBytes = sizeof(Particle);
 	DirectXHelper::VertexBuffer vb;
@@ -170,19 +170,23 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			DispatchMessage(&msg);
 		}
 		else {
+			directXDevice.BeginFrame();
 			directXDevice.StertScreenRendering();
 			auto cmdList = directXDevice.GetCommnadList();
 			{
-				auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(rwsb.Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+				ImGui::Begin("Test");
+				ImGui::End();
+
+				auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(particlesBuffer.Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 				cmdList->ResourceBarrier(1, &barrier);
 				cmdList->SetComputeRootSignature(crs.Get());
 				cmdList->SetPipelineState(cpso.Get());
-				cmdList->SetComputeRootDescriptorTable(0, uav.gpu);
+				cmdList->SetComputeRootDescriptorTable(0, particlesBufferView.gpu);
 				cmdList->SetComputeRootConstantBufferView(1, targetCB.GetGPUAddress());
 				cmdList->Dispatch(kParticleCount, 1, 1);
 				D3D12_RESOURCE_BARRIER barriers[] = {
-					CD3DX12_RESOURCE_BARRIER::UAV(rwsb.Get()),
-					CD3DX12_RESOURCE_BARRIER::Transition(rwsb.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_GENERIC_READ) 
+					CD3DX12_RESOURCE_BARRIER::UAV(particlesBuffer.Get()),
+					CD3DX12_RESOURCE_BARRIER::Transition(particlesBuffer.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_GENERIC_READ) 
 				};
 				cmdList->ResourceBarrier(_countof(barriers), barriers);
 
@@ -204,7 +208,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				cmdList->SetGraphicsRootConstantBufferView(0, cb.GetGPUAddress());
 				cmdList->DrawInstanced(kParticleCount, 1, 0, 0);
 			}
-
 			directXDevice.FinishScreenRendering();
 		}
 	}

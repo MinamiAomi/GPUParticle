@@ -1,4 +1,7 @@
-#include "Particle.hlsli"
+#define HLSL
+#include "ParticleGraphics_HLSLCompat.h"
+
+ConstantBuffer<ParticleShader::Scene> sceneCB : register(b0);
 
 struct VertexShaderInput {
 	float32_t4 position : POSITION0;
@@ -10,6 +13,6 @@ struct VertexShaderOutput {
 
 VertexShaderOutput main(VertexShaderInput input) {
 	VertexShaderOutput output;
-	output.position = mul(input.position, g_transformCB.viewMatrix);
+	output.position = mul(input.position, sceneCB.viewMatrix);
 	return output;
 }

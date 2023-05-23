@@ -52,7 +52,7 @@ namespace DirectXHelper {
 		D3D12_CPU_DESCRIPTOR_HANDLE cpu{};
 		D3D12_GPU_DESCRIPTOR_HANDLE gpu{};
 
-		bool IsValid() const { return cpu.ptr != 0; }
+		bool IsEnabled() const { return cpu.ptr != 0; }
 		bool IsShaderVisible() const { return gpu.ptr != 0; }
 	private:
 #ifdef _DEBUG
@@ -83,7 +83,7 @@ namespace DirectXHelper {
 		uint32_t GetDescriptorSize() const { return descriptorSize_; }
 		D3D12_DESCRIPTOR_HEAP_TYPE GetType() const { return type_; }
 		bool IsShaderVisible() const { return gpuStartHandle_.ptr != 0; }
-		bool IsValid() const { return heap_; }
+		bool IsEnabled() const { return heap_; }
 
 	private:
 		DirectXHelper::ComPtr<ID3D12DescriptorHeap> heap_;

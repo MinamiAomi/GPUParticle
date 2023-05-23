@@ -1,4 +1,7 @@
-#include "Particle.hlsli"
+#define HLSL
+#include "ParticleGraphics_HLSLCompat.h"
+
+ConstantBuffer<ParticleShader::Scene> sceneCB : register(b0);
 
 struct GeometryShaderInput {
 	float32_t4 position : POSITION0;
@@ -24,7 +27,7 @@ void main(
 	for (uint32_t i = 0; i < 4; ++i) {
 		GeometryShaderOutput e;
 		float32_t2 newPos = input[0].position.xy + pos[i];
-		e.position = mul(float32_t4(newPos, input[0].position.zw), g_transformCB.projectionMatrix);
+		e.position = mul(float32_t4(newPos, input[0].position.zw), sceneCB.projectionMatrix);
 		e.uv = pos[i].xy;
 		output.Append(e);
 	}

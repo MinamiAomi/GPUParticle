@@ -16,11 +16,21 @@ void DirectXDevice::Initalize(HWND hwnd, uint32_t clientWidth, uint32_t clientHe
 	CreateDescriptorHeap();
 	CreateSwapChain();
 	CreateDepthStencilBuffer();
+	CreateImGui();
 }
 
 void DirectXDevice::Finalize() {
 	WaitForGPU();
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 	CloseHandle(fenceEvent_);
+}
+
+void DirectXDevice::BeginFrame() {
+	ImGui_ImplDX12_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
 }
 
 void DirectXDevice::StertScreenRendering() {
@@ -67,7 +77,12 @@ void DirectXDevice::StertScreenRendering() {
 void DirectXDevice::FinishScreenRendering() {
 	auto backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
-			auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+	ImGui::Render();
+	ID3D12DescriptorHeap* ppHeaps[] = { commonHeap_.Get() };
+	commandList_->SetDescriptorHeaps(1, ppHeaps);
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
+	
+	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 				swapChainResource_[backBufferIndex].Get(),
 			D3D12_RESOURCE_STATE_RENDER_TARGET,
 			D3D12_RESOURCE_STATE_PRESENT);
@@ -285,4 +300,18 @@ void DirectXDevice::CreateDepthStencilBuffer() {
 		.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D
 	};
 	device_->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, dsvHandle_.cpu);
+}
+
+void DirectXDevice::CreateImGui() {
+	imguiDescriptor_ = commonHeap_.Allocate();
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(hwnd_);
+	ImGui_ImplDX12_Init(device_.Get(),
+		kSwapChainBufferCount,
+		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+		commonHeap_.Get(),
+		imguiDescriptor_.cpu,
+		imguiDescriptor_.gpu);
 }

@@ -71,9 +71,6 @@
     <ClCompile Include="..\Externals\imgui\imgui_widgets.cpp">
       <Filter>Externals\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="ImGuiManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Debug.h">
@@ -128,8 +125,14 @@
     <ClInclude Include="..\Externals\DirectX\d3dx12.h">
       <Filter>Externals\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiManager.h">
-      <Filter>Include</Filter>
+    <ClInclude Include="Resource\Shader\ParticleCompute_HLSLCompat.h">
+      <Filter>Resource\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\Shader\ParticleGraphics_HLSLCompat.h">
+      <Filter>Resource\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\Shader\HLSLCompat.h">
+      <Filter>Resource\Shader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -138,16 +141,13 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resource\Shader\Particle.PS.hlsl">
+    <None Include="Resource\Shader\ParticleGraphics_PS.hlsl">
       <Filter>Resource\Shader</Filter>
     </None>
-    <None Include="Resource\Shader\Particle.VS.hlsl">
+    <None Include="Resource\Shader\ParticleGraphics_VS.hlsl">
       <Filter>Resource\Shader</Filter>
     </None>
-    <None Include="Resource\Shader\Particle.hlsli">
-      <Filter>Resource\Shader</Filter>
-    </None>
-    <None Include="Resource\Shader\Particle.GS.hlsl">
+    <None Include="Resource\Shader\ParticleGraphics_GS.hlsl">
       <Filter>Resource\Shader</Filter>
     </None>
     <None Include="Resource\Shader\ParticleUpdate.CS.hlsl">

@@ -85,7 +85,7 @@ namespace DirectXHelper {
 	}
 
 	void DescriptorHeap::Deallocate(Descriptor& descriptorHandle) {
-		assert(descriptorHandle.IsValid());
+		assert(descriptorHandle.IsEnabled());
 		assert(heap_ && allocateIndex_);
 		assert(descriptorHandle.container == this);
 		assert(descriptorHandle.cpu.ptr >= cpuStartHandle_.ptr);

@@ -14,6 +14,7 @@ public:
 
 	void Initalize(HWND hwnd_, uint32_t clientWidth, uint32_t clientHeight);
 	void Finalize();
+	void BeginFrame();
 	void StertScreenRendering();
 	void FinishScreenRendering();
 
@@ -44,6 +45,7 @@ private:
 	void CreateDescriptorHeap();
 	void CreateSwapChain();
 	void CreateDepthStencilBuffer();
+	void CreateImGui();
 
 	HWND												hwnd_{};
 
@@ -64,10 +66,11 @@ private:
 
 	DirectXHelper::ComPtr<IDXGISwapChain4>				swapChain_;
 	DirectXHelper::ComPtr<ID3D12Resource>				swapChainResource_[kSwapChainBufferCount]{};
-	DirectXHelper::Descriptor							rtvHandle_[kSwapChainBufferCount];
+	DirectXHelper::Descriptor							rtvHandle_[kSwapChainBufferCount]{};
 	DirectXHelper::ComPtr<ID3D12Resource>				depthStencilResource_;
 	DirectXHelper::Descriptor							dsvHandle_{};
 	uint32_t											swapChainWidth_{ 0 };
 	uint32_t											swapChainHeight_{ 0 };
+	DirectXHelper::Descriptor							imguiDescriptor_{};
 };
 

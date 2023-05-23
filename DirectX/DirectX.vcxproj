@@ -149,7 +149,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="..\Externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="..\Externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\Externals\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="ImGuiManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Debug.cpp" />
     <ClCompile Include="Source\DirectXDevice.cpp" />
@@ -172,7 +171,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="..\Externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\Externals\imgui\imstb_textedit.h" />
     <ClInclude Include="..\Externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="ImGuiManager.h" />
     <ClInclude Include="Include\Debug.h" />
     <ClInclude Include="Include\DirectXDevice.h" />
     <ClInclude Include="Include\DirectXHelper.h" />
@@ -181,26 +179,29 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Include\StringUtils.h" />
     <ClInclude Include="Include\Window.h" />
     <ClInclude Include="MathUtils_inline.h" />
+    <ClInclude Include="Resource\Shader\HLSLCompat.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Resource\Shader\ParticleCompute_HLSLCompat.h" />
+    <ClInclude Include="Resource\Shader\ParticleGraphics_HLSLCompat.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Externals\imgui\LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resource\Shader\Particle.hlsli">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Resource\Shader\Particle.PS.hlsl">
+    <None Include="Resource\Shader\ParticleGraphics_PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
     </None>
-    <None Include="Resource\Shader\Particle.VS.hlsl">
+    <None Include="Resource\Shader\ParticleGraphics_VS.hlsl">
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resource\Shader\Particle.GS.hlsl">
+    <None Include="Resource\Shader\ParticleGraphics_GS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
