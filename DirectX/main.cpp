@@ -34,7 +34,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 		auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(Particle) * kParticleCount);
 		resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-		particlesBuffer.Create(directXDevice.GetDevice(), heapProperties, resourceDesc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, "ParticleBuffer");
+		particlesBuffer.Create(directXDevice.GetDevice(), heapProperties, resourceDesc, D3D12_RESOURCE_STATE_COMMON, "ParticleBuffer");
 		particlesBufferView = directXDevice.GetCommonHeap().Allocate();
 		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
 		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
@@ -64,6 +64,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		auto cmdList = directXDevice.GetCommnadList();
 
+		D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(particlesBuffer.Get(), D3D12_RESOURCE_STATE_COMMON,D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		cmdList->ResourceBarrier(1, &barrier);
 		ID3D12DescriptorHeap* ppHeaps[] = { directXDevice.GetCommonHeap().Get() };
 		cmdList->SetDescriptorHeaps(1, ppHeaps);
 		cmdList->SetComputeRootSignature(crs.Get());

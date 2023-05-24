@@ -71,6 +71,12 @@
     <ClCompile Include="..\Externals\imgui\imgui_widgets.cpp">
       <Filter>Externals\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="GPUParticle.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Debug.h">
@@ -133,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="Resource\Shader\HLSLCompat.h">
       <Filter>Resource\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUParticle.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
