@@ -17,7 +17,7 @@ public:
 
 private:
 	Math::Vector3 position_ = { 0.0f, 1.5f, -5.0f };
-	Math::Quaternion rotate_ = Math::Quaternion::Make;
+	Math::Quaternion rotate_ = Math::Quaternion::MakeLookRotation(-position_);
 
 	float fovY_{ Math::ToRad(45.0f) };
 	float aspect_{ 1280.0f / 720.0f };

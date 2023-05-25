@@ -107,7 +107,7 @@ namespace Math {
 		}
 		// 球面線形補間の計算
 		float theta = std::acos(dot_val);
-		return (std::sin((1 - t) * theta) * s + std::sin(t * theta) * end) * (1.0f / std::sin(theta));
+		return (std::sin((1.0f - t) * theta) * s + std::sin(t * theta) * end) * (1.0f / std::sin(theta));
 	}
 
 	float Determinant(const Matrix44& m) {

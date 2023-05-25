@@ -1,6 +1,6 @@
 #pragma once
- #ifndef MATHUTILS_INLINE_H_
- #define MATHUTILS_INLINE_H_
+#ifndef MATHUTILS_INLINE_H_
+#define MATHUTILS_INLINE_H_
 #include "MathUtils.h"
 
 namespace Math {
@@ -289,37 +289,91 @@ namespace Math {
 	}
 	inline Quaternion Quaternion::MakeFromAngleAxis(float angle, const Vector3& axis) {
 		float sin2 = std::sin(angle * 0.5f);
-		Quaternion result;
-		result.x = axis.x * sin2;
-		result.y = axis.y * sin2;
-		result.z = axis.z * sin2;
-		result.w = std::cos(angle * 0.5f);
-		return result;
+		return Quaternion{
+			axis.x * sin2,
+			axis.y * sin2,
+			axis.z * sin2,
+			std::cos(angle * 0.5f)
+		};
 	}
-	inline Quaternion Quaternion::MakeFromEuler(const Vector3& euler) {
+	inline Quaternion Quaternion::MakeFromEulerAngle(const Vector3& euler) {
 		// ピッチ ヨー ロールの順
 		Vector3 s = Vector3(std::sin(euler.x * 0.5f), std::sin(euler.y * 0.5f), std::sin(euler.z * 0.5f));
 		Vector3 c = Vector3(std::cos(euler.x * 0.5f), std::cos(euler.y * 0.5f), std::cos(euler.z * 0.5f));
-		Quaternion result;
-		result.x = s.x * c.y * c.z - c.x * s.y * s.z;
-		result.y = c.x * s.y * c.z + s.x * c.y * s.z;
-		result.z = c.x * c.y * s.z - s.x * s.y * c.z;
-		result.w = c.x * c.y * c.z + s.x * s.y * s.z;
-		return result;
+		return Quaternion{
+			s.x * c.y * c.z - c.x * s.y * s.z,
+			c.x * s.y * c.z + s.x * c.y * s.z,
+			c.x * c.y * s.z - s.x * s.y * c.z,
+			c.x * c.y * c.z + s.x * s.y * s.z
+		};
 	}
-	inline Quaternion Quaternion::MakeFromXAxis(float angle) {
+	inline Quaternion Quaternion::MakeForXAxis(float angle) {
 		return Quaternion(std::sin(angle / 2.0f), 0.0f, 0.0f, std::cos(angle / 2.0f));
 	}
-	inline Quaternion Quaternion::MakeFromYAxis(float angle) {
+	inline Quaternion Quaternion::MakeForYAxis(float angle) {
 		return Quaternion(0.0f, std::sin(angle / 2.0f), 0.0f, std::cos(angle / 2.0f));
 	}
-	inline Quaternion Quaternion::MakeFromZAxis(float angle) {
+	inline Quaternion Quaternion::MakeForZAxis(float angle) {
 		return Quaternion(0.0f, 0.0f, std::sin(angle / 2.0f), std::cos(angle / 2.0f));
 	}
 	inline Quaternion Quaternion::MakeFromTwoVector(const Vector3& v1, const Vector3& v2) {
 		Vector3 axis = Normalize(Cross(v1, v2));
 		float angle = std::acos(Dot(v1, v2));
 		return MakeFromAngleAxis(angle, axis);
+	}
+	inline Quaternion Quaternion::MakeFromOrthonormal(const Vector3& x, const Vector3& y, const Vector3& z) {
+		float trace = x.x + y.y + z.z;
+
+		if (trace > 0.0f) {
+			float s = std::sqrt(trace + 1.0f) * 0.5f;
+			Quaternion result{};
+			result.w = s;
+			s = 0.25f / s;
+			result.x = (y.z - z.y) * s;
+			result.y = (z.x - x.z) * s;
+			result.z = (x.y - y.x) * s;
+			return result;
+		}
+		else if (x.x > y.y && x.x > z.z) {
+			float s = std::sqrt(1.0f + x.x - y.y - z.z) * 0.5f;
+			Quaternion result{};
+			result.x = s;
+			s = 0.25f / s;
+			result.y = (x.y + y.x) * s;
+			result.z = (z.x + x.z) * s;
+			result.w = (y.z - z.y) * s;
+			return result;
+		}
+		else if (y.y > z.z) {
+			float s = std::sqrt(1.0f - x.x + y.y - z.z) * 0.5f;
+			Quaternion result{};
+			result.y = s;
+			s = 0.25f / s;
+			result.x = (x.y + y.x) * s;
+			result.z = (y.z + z.y) * s;
+			result.w = (z.x - x.z) * s;
+			return result;
+		}
+		Quaternion result{};
+		float s = std::sqrt(1.0f - x.x - y.y + z.z) * 0.5f;
+		result.z = s;
+		s = 0.25f / s;
+		result.x = (z.x + x.z) * s;
+		result.y = (y.z + z.y) * s;
+		result.w = (x.y - y.x) * s;
+		return result;
+	}
+	inline Quaternion Quaternion::MakeLookRotation(const Vector3& direction, const Vector3& up) {
+		Vector3 z = Normalize(direction);
+		Vector3 x = Normalize(Cross(up, z));
+		Vector3 y = Cross(z, x);
+		return MakeFromOrthonormal(x, y, z);
+	}
+	inline Quaternion Quaternion::MakeFromMatrix(const Matrix44& m) {
+		Vector3 x{ m.m[0][0],m.m[0][1],m.m[0][2] };
+		Vector3 y{ m.m[1][0],m.m[1][1],m.m[1][2] };
+		Vector3 z{ m.m[2][0],m.m[2][1],m.m[2][2] };
+		return MakeFromOrthonormal(x, y, z);
 	}
 	inline Quaternion operator+(const Quaternion& q1, const Quaternion& q2) {
 		return Quaternion{ q1.x + q2.x, q1.y + q2.y, q1.z + q2.z, q1.w + q2.w };
@@ -339,7 +393,7 @@ namespace Math {
 	}
 	inline Vector3 operator*(const Quaternion& q, const Vector3& v) {
 		Vector3 qv = q.xyz();
-		return { v + 2.0f * Cross(qv, Cross(qv, v) + q.w * v) };
+		return v + 2.0f * Cross(qv, Cross(qv, v) + q.w * v);
 	}
 	inline Quaternion Conjugate(const Quaternion& q) {
 		return Quaternion{ -q.x, -q.y, -q.z, q.w };
@@ -374,14 +428,14 @@ namespace Math {
 	inline Vector3  Matrix44::GetTranslate() const {
 		return { m[3][0], m[3][1], m[3][2] };
 	}
-	inline Matrix44 Matrix44::MakeScale(const Vector3& scale) {
+	inline Matrix44 Matrix44::MakeScaling(const Vector3& scale) {
 		return {
 			scale.x, 0.0f, 0.0f, 0.0f,
 			0.0f, scale.y, 0.0f, 0.0f,
 			0.0f, 0.0f, scale.z, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f };
 	}
-	inline Matrix44 Matrix44::MakeRotateX(float rotate) {
+	inline Matrix44 Matrix44::MakeRotationX(float rotate) {
 		float c = std::cos(rotate);
 		float s = std::sin(rotate);
 		return {
@@ -390,7 +444,7 @@ namespace Math {
 			0.0f, -s, c, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f };
 	}
-	inline Matrix44 Matrix44::MakeRotateY(float rotate) {
+	inline Matrix44 Matrix44::MakeRotationY(float rotate) {
 		float s = std::sin(rotate);
 		float c = std::cos(rotate);
 		return {
@@ -399,7 +453,7 @@ namespace Math {
 			s,		0.0f,	c,		0.0f,
 			0.0f,	0.0f,	0.0f,	1.0f };
 	}
-	inline Matrix44 Matrix44::MakeRotateZ(float rotate) {
+	inline Matrix44 Matrix44::MakeRotationZ(float rotate) {
 		float s = std::sin(rotate);
 		float c = std::cos(rotate);
 		return {
@@ -408,7 +462,7 @@ namespace Math {
 			0.0f,	0.0f,	1.0f,	0.0f,
 			0.0f,	0.0f,	0.0f,	1.0f };
 	}
-	inline Matrix44 Matrix44::MakeRotateXYZ(const Vector3& rotate) {
+	inline Matrix44 Matrix44::MakeRotationXYZ(const Vector3& rotate) {
 		Vector3 s = { std::sin(rotate.x), std::sin(rotate.y), std::sin(rotate.z) };
 		Vector3 c = { std::cos(rotate.x), std::cos(rotate.y), std::cos(rotate.z) };
 		return {
@@ -417,7 +471,7 @@ namespace Math {
 			c.x * s.y * c.z + s.x * s.z,	c.x * s.y * s.z - s.x * c.z,	c.x * c.y,	0.0f,
 			0.0f,	0.0f,	0.0f,	1.0f };
 	}
-	inline Matrix44 Matrix44::MakeRotateFromQuaternion(const Quaternion& q) {
+	inline Matrix44 Matrix44::MakeRotationFromQuaternion(const Quaternion& q) {
 		float w2 = q.w * q.w, x2 = q.x * q.x, y2 = q.y * q.y, z2 = q.z * q.z;
 		float wx = q.w * q.x, wy = q.w * q.y, wz = q.w * q.z;
 		float xy = q.x * q.y, xz = q.x * q.z, yz = q.y * q.z;
@@ -428,7 +482,7 @@ namespace Math {
 			2.0f * (wy + xz),	2.0f * (-wx + yz),	w2 - x2 - y2 + z2,	0.0f,
 			0.0f,				0.0f,				0.0f,				1.0f };
 	}
-	inline Matrix44 Matrix44::MakeTranslate(const Vector3& translate) {
+	inline Matrix44 Matrix44::MakeTranslation(const Vector3& translate) {
 		return {
 		1.0f,		0.0f,		0.0f,		0.0f,
 		0.0f,		1.0f,		0.0f,		0.0f,
@@ -486,7 +540,7 @@ namespace Math {
 				1.0f
 		};
 	}
-	inline Matrix44 Matrix44::MakeLookAt(const Vector3& eye, const Vector3& target, const Vector3& up) {
+	inline Matrix44 Matrix44::MakeLookRotation(const Vector3& eye, const Vector3& target, const Vector3& up) {
 		Vector3 z = Normalize(target - eye);
 		Vector3 x = Normalize(Cross(up, z));
 		Vector3 y = Cross(z, x);
@@ -497,7 +551,7 @@ namespace Math {
 			0.0f, 0.0f, 0.0f, 1.0f };
 	}
 	inline Matrix44 Matrix44::MakeBillBoard(const Vector3& eye, const Vector3& target, const Vector3& up) {
-		return MakeLookAt(eye, target, up);
+		return MakeLookRotation(eye, target, up);
 	}
 	inline Matrix44 Matrix44::MakeBillBoardYAxis(const Vector3& eye, const Vector3& target, const Vector3& up) {
 		Vector3 z = Normalize(target - eye);

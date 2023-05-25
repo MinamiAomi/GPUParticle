@@ -173,25 +173,25 @@ namespace Math {
 		/// </summary>
 		/// /// <param name="euler"></param>
 		/// <returns></returns>
-		static inline Quaternion MakeFromEuler(const Vector3& euler);
+		static inline Quaternion MakeFromEulerAngle(const Vector3& euler);
 		/// <summary>
 		/// X軸を回転軸にクォータニオンを作成
 		/// </summary>
 		/// <param name="angle"></param>
 		/// <returns></returns>
-		static inline Quaternion MakeFromXAxis(float angle);
+		static inline Quaternion MakeForXAxis(float angle);
 		/// <summary>
 		/// Y軸を回転軸にクォータニオンを作成
 		/// </summary>
 		/// <param name="angle"></param>
 		/// <returns></returns>
-		static inline Quaternion MakeFromYAxis(float angle);
+		static inline Quaternion MakeForYAxis(float angle);
 		/// <summary>
 		/// Z軸を回転軸にクォータニオンを作成
 		/// </summary>
 		/// <param name="angle"></param>
 		/// <returns></returns>
-		static inline Quaternion MakeFromZAxis(float angle);
+		static inline Quaternion MakeForZAxis(float angle);
 		/// <summary>
 		/// 二つのベクトルからクォータニオンを作成
 		/// </summary>
@@ -199,6 +199,27 @@ namespace Math {
 		/// <param name="v2"></param>
 		/// <returns></returns>
 		static inline Quaternion MakeFromTwoVector(const Vector3& v1, const Vector3& v2);
+		/// <summary>
+		/// 正規直交軸からクォータニオンを作成
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="z"></param>
+		/// <returns></returns>
+		static inline Quaternion MakeFromOrthonormal(const Vector3& x, const Vector3& y, const Vector3& z);
+		/// <summary>
+		/// Directionの方向を向くクォータニオンを作成
+		/// </summary>
+		/// <param name="direction">方向</param>
+		/// <param name="up">上ベクトル</param>
+		/// <returns></returns>
+		static inline Quaternion MakeLookRotation(const Vector3& direction, const Vector3& up = Vector3::UnitY);
+		/// <summary>
+		/// 正規直交行列からクォータニオンを作成
+		/// </summary>
+		/// <param name="m">正規直交行列</param>
+		/// <returns></returns>
+		static inline Quaternion MakeFromMatrix(const Matrix44& m);
 	};
 
 	inline Quaternion operator+(const Quaternion& q1, const Quaternion& q2);
@@ -232,43 +253,43 @@ namespace Math {
 		/// </summary>
 		/// <param name="scale"></param>
 		/// <returns></returns>
-		static inline Matrix44 MakeScale(const Vector3& scale);
+		static inline Matrix44 MakeScaling(const Vector3& scale);
 		/// <summary>
 		/// x軸回りの回転行列を作成
 		/// </summary>
 		/// <param name="rotate"></param>
 		/// <returns></returns>
-		static inline Matrix44 MakeRotateX(float rotate);
+		static inline Matrix44 MakeRotationX(float rotate);
 		/// <summary>
 		/// y軸回りの回転行列を作成
 		/// </summary>
 		/// <param name="rotate"></param>
 		/// <returns></returns>
-		static inline Matrix44 MakeRotateY(float rotate);
+		static inline Matrix44 MakeRotationY(float rotate);
 		/// <summary>
 		/// z軸回りの回転行列を作成
 		/// </summary>
 		/// <param name="rotate"></param>
 		/// <returns></returns>
-		static inline Matrix44 MakeRotateZ(float rotate);
+		static inline Matrix44 MakeRotationZ(float rotate);
 		/// <summary>
 		/// 回転行列を作成
 		/// </summary>
 		/// <param name="rotate"></param>
 		/// <returns></returns>
-		static inline Matrix44 MakeRotateXYZ(const Vector3& rotate);
+		static inline Matrix44 MakeRotationXYZ(const Vector3& rotate);
 		/// <summary>
 		/// クォータニオン回転行列を作成
 		/// </summary>
 		/// <param name="q"></param>
 		/// <returns></returns>
-		static inline Matrix44 MakeRotateFromQuaternion(const Quaternion& q);
+		static inline Matrix44 MakeRotationFromQuaternion(const Quaternion& q);
 		/// <summary>
 		/// 平行移動行列
 		/// </summary>
 		/// <param name="translate"></param>
 		/// <returns></returns>
-		static inline Matrix44 MakeTranslate(const Vector3& translate);
+		static inline Matrix44 MakeTranslation(const Vector3& translate);
 		/// <summary>
 		/// アフィン変換行列を作成
 		/// </summary>
@@ -292,7 +313,7 @@ namespace Math {
 		/// <param name="target">向ける座標</param>
 		/// <param name="up">上ベクトル</param>
 		/// <returns></returns>
-		static inline Matrix44 MakeLookAt(const Vector3& eye, const Vector3& target, const Vector3& up);
+		static inline Matrix44 MakeLookRotation(const Vector3& eye, const Vector3& target, const Vector3& up);
 		/// <summary>
 		/// 全方向ビルボード行列を作成
 		/// </summary>
