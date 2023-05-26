@@ -77,6 +77,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Debug.h">
@@ -96,9 +99,6 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Include\MathUtils.h">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="MathUtils_inline.h">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Include\DirectXDevice.h">
@@ -144,6 +144,12 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\MathUtils_inline.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

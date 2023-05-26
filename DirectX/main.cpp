@@ -2,6 +2,7 @@
 #include "DirectXDevice.h"
 #include "ShaderCompiler.h"
 #include "MathUtils.h"
+#include "Input.h"
 
 using namespace Math;
 
@@ -10,8 +11,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Window window;
 	window.Create();
 
+	Input::Initalize(window.GetHWND());
+
 	DirectXDevice directXDevice;
-	directXDevice.Initalize(window.GetHWND(), window.GetClientWidth(), window.GetClientHeight());
+	directXDevice.Initalize(window.GetHWND());
 
 	ShaderCompiler::Initalize();
 
@@ -20,12 +23,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	DirectXHelper::GPUResource particlesBuffer;
 	DirectXHelper::Descriptor particlesBufferView;
 	DirectXHelper::ConstantBuffer targetCB;
-	static const uint32_t kParticleCount = 10;
+	static const uint32_t kParticleCount = 8388608;
 	struct TargetCB {
 		Vector3 target;
 	};
 	struct Particle {
-		Vector3 position;
+		Vector4 position;
 		Vector3 velocity;
 		Vector3 acceleration;
 	};
@@ -42,7 +45,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		uavDesc.Buffer.StructureByteStride = sizeof(Particle);
 		directXDevice.GetDevice()->CreateUnorderedAccessView(particlesBuffer.Get(), nullptr, &uavDesc, particlesBufferView.cpu);
 
-		target.target = { 0.0f,0.0f,20.0f };
+		target.target = { 0.0f,0.0f,0.1f };
 		targetCB.Create(directXDevice.GetDevice(), sizeof(TargetCB));
 		targetCB.WriteData(&target);
 	}
@@ -176,8 +179,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			directXDevice.StertScreenRendering();
 			auto cmdList = directXDevice.GetCommnadList();
 			{
-				ImGui::Begin("Test");
-				ImGui::End();
+				
 
 				auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(particlesBuffer.Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 				cmdList->ResourceBarrier(1, &barrier);
@@ -185,7 +187,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				cmdList->SetPipelineState(cpso.Get());
 				cmdList->SetComputeRootDescriptorTable(0, particlesBufferView.gpu);
 				cmdList->SetComputeRootConstantBufferView(1, targetCB.GetGPUAddress());
-				cmdList->Dispatch(kParticleCount, 1, 1);
+				cmdList->Dispatch(kParticleCount / 16, 1, 1);
 				D3D12_RESOURCE_BARRIER barriers[] = {
 					CD3DX12_RESOURCE_BARRIER::UAV(particlesBuffer.Get()),
 					CD3DX12_RESOURCE_BARRIER::Transition(particlesBuffer.Get(),D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_GENERIC_READ) 
@@ -195,7 +197,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 			// 更新
 			{
-				transform.viewMatrix = Inverse(Matrix44::MakeAffine(Vector3{ 1.0f }, Vector3{ 0.0f }, { 0.0f,0.0f,-5.0f }));
+				Vector3 position{ 0.0f,0.0f,-10.0f };
+				Quaternion rotate = Quaternion::MakeLookRotation(-position);
+				transform.viewMatrix = Inverse(Matrix44::MakeAffine(Vector3{ 1.0f }, rotate, position));
 				cb.WriteData(&transform);
 			}
 

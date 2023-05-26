@@ -26,8 +26,9 @@ void main(
 	};
 	for (uint32_t i = 0; i < 4; ++i) {
 		GeometryShaderOutput e;
-		float32_t2 newPos = input[0].position.xy + pos[i];
-		e.position = mul(float32_t4(newPos, input[0].position.zw), sceneCB.projectionMatrix);
+		e.position = input[0].position;
+		e.position.xy += pos[i] * 0.05f;
+		e.position = mul(e.position, sceneCB.projectionMatrix);
 		e.uv = pos[i].xy;
 		output.Append(e);
 	}

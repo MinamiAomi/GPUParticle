@@ -12,7 +12,7 @@ public:
 	static const uint32_t kCommonDescriptorMaxCount = 1024;
 
 
-	void Initalize(HWND hwnd_, uint32_t clientWidth, uint32_t clientHeight);
+	void Initalize(HWND hwnd);
 	void Finalize();
 	void BeginFrame();
 	void StertScreenRendering();

@@ -151,6 +151,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="..\Externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GPUParticle.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Debug.cpp" />
     <ClCompile Include="Source\DirectXDevice.cpp" />
@@ -179,10 +180,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Include\DirectXDevice.h" />
     <ClInclude Include="Include\DirectXHelper.h" />
     <ClInclude Include="Include\MathUtils.h" />
+    <ClInclude Include="Include\MathUtils_inline.h" />
     <ClInclude Include="Include\ShaderCompiler.h" />
     <ClInclude Include="Include\StringUtils.h" />
     <ClInclude Include="Include\Window.h" />
-    <ClInclude Include="MathUtils_inline.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Resource\Shader\HLSLCompat.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>

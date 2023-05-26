@@ -4,13 +4,17 @@
 
 using namespace DirectXHelper;
 
-void DirectXDevice::Initalize(HWND hwnd, uint32_t clientWidth, uint32_t clientHeight) {
+void DirectXDevice::Initalize(HWND hwnd) {
 	assert(hwnd);
 	assert(!device_);
 	assert(!commandQueue_);
 	hwnd_ = hwnd;
-	swapChainWidth_ = clientWidth;
-	swapChainHeight_ = clientHeight;
+	// ウィンドウ情報を取得
+	WINDOWINFO windowInfo{};
+	windowInfo.cbSize = sizeof(WINDOWINFO);
+	if (!GetWindowInfo(hwnd, &windowInfo)) { assert(false); }
+	swapChainWidth_ = windowInfo.rcClient.right - windowInfo.rcClient.left;
+	swapChainHeight_ = windowInfo.rcClient.bottom - windowInfo.rcClient.top;
 	CreateDevice();
 	CreateCommands();
 	CreateDescriptorHeap();
@@ -81,19 +85,19 @@ void DirectXDevice::FinishScreenRendering() {
 	ID3D12DescriptorHeap* ppHeaps[] = { commonHeap_.Get() };
 	commandList_->SetDescriptorHeaps(1, ppHeaps);
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList_.Get());
-	
+
 	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-				swapChainResource_[backBufferIndex].Get(),
-			D3D12_RESOURCE_STATE_RENDER_TARGET,
-			D3D12_RESOURCE_STATE_PRESENT);
-		commandList_->ResourceBarrier(1, &barrier);
-	
+		swapChainResource_[backBufferIndex].Get(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PRESENT);
+	commandList_->ResourceBarrier(1, &barrier);
+
 	WaitForGPU();
 	SubmitCommandList();
 	GetSwapChain()->Present(1, 0);
-	
+
 	auto nextBackBufferIndex = GetSwapChain()->GetCurrentBackBufferIndex();
-	ResetCommandList(nextBackBufferIndex);	
+	ResetCommandList(nextBackBufferIndex);
 }
 
 void DirectXDevice::SubmitCommandList() {
@@ -231,7 +235,7 @@ void DirectXDevice::CreateSwapChain() {
 		.Format = DXGI_FORMAT_R8G8B8A8_UNORM,			// 色の形式
 		.SampleDesc{
 			.Count = 1									// マルチサンプルしない
-		},					
+		},
 		.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,	// 描画ターゲットとして利用する
 		.BufferCount = kSwapChainBufferCount,
 		.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,	// モニタに移したら、中身を破棄

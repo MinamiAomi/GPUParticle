@@ -21,6 +21,7 @@
 #include <dxcapi.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
+#include <dinput.h>
 #include <Windows.h>
 #include <wrl.h>
 
@@ -36,5 +37,8 @@
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
+#pragma comment(lib,"dinput8.lib")
+
+//#define DIRECTINPUT_VERSION 0x0800 // DirectIputのバージョン指定
 
 #define DELETE_COPY_MOVE(C) C(C&) = delete; C& operator=(C&) = delete; C(C&&) = delete; C& operator=(C&&) = delete;
