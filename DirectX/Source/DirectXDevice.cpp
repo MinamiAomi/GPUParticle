@@ -52,7 +52,7 @@ void DirectXDevice::StertScreenRendering() {
 		false,
 		&dsvHandle_.cpu);
 
-	float clearColor[4] = { 0.1f,0.3f,0.6f,1.0f };
+	float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
 	commandList_->ClearRenderTargetView(rtvHandle_[backBufferIndex].cpu, clearColor, 0, nullptr);
 	commandList_->ClearDepthStencilView(dsvHandle_.cpu, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 

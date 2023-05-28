@@ -10,6 +10,6 @@ struct PixelShaderOutput {
 PixelShaderOutput main(PixelShaderInput input) {
 	float alpha = 1.0f - length(input.uv);
 	PixelShaderOutput output;
-	output.color = float32_t4(0.01f, 0.01f, 0.01f, alpha);
+	output.color = float32_t4(0.3f, 0.3f, 0.3f, alpha);
 	return output;
 }

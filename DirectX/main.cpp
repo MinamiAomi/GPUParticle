@@ -23,7 +23,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	DirectXHelper::GPUResource particlesBuffer;
 	DirectXHelper::Descriptor particlesBufferView;
 	DirectXHelper::ConstantBuffer targetCB;
-	static const uint32_t kParticleCount = 8388608;
+	static const uint32_t kParticleCount = 65536;
 	struct TargetCB {
 		Vector3 target;
 	};
@@ -166,6 +166,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		float aspect = static_cast<float>(directXDevice.GetSwapChainWidth()) / static_cast<float>(directXDevice.GetSwapChainHeight());
 		transform.projectionMatrix = Matrix44::MakePerspectiveProjection(ToRad(45.0f), aspect, 0.01f, 100.0f);
 	}
+	Vector3 position{ 0.0f,0.0f,-10.0f };
+	Vector3 euler{};
+	Quaternion rotate = Quaternion::MakeLookRotation(target.target - position);
 
 	// メインループ
 	MSG msg{};
@@ -179,6 +182,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			directXDevice.StertScreenRendering();
 			auto cmdList = directXDevice.GetCommnadList();
 			{
+
+				ImGui::Begin("Window");
+				ImGui::DragFloat3("pos", &target.target.x, 0.01f);
+				targetCB.WriteData(&target);
 				
 
 				auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(particlesBuffer.Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
@@ -197,8 +204,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 			// 更新
 			{
-				Vector3 position{ 0.0f,0.0f,-10.0f };
-				Quaternion rotate = Quaternion::MakeLookRotation(-position);
+
+				ImGui::DragFloat3("Camera pos", &position.x, 0.1f);
+				ImGui::DragFloat3("CameraRotate", &euler.x, 0.01f, 0.0f, Math::Pi * 2.0f);
+				rotate = Quaternion::MakeFromEulerAngle(euler);
+				ImGui::End();
+				
 				transform.viewMatrix = Inverse(Matrix44::MakeAffine(Vector3{ 1.0f }, rotate, position));
 				cb.WriteData(&transform);
 			}

@@ -6,10 +6,13 @@ RWStructuredBuffer<ParticleShader::Particle> particlesRWSB : register(u0);
 [numthreads(1, 1, 1)]
 void main(uint32_t3 DTid : SV_DispatchThreadID) {
 	particlesRWSB[DTid.x].acceleration = float32_t3(0.0f, 0.0f, 0.0f);
-	float32_t ring = 8388608.0f / 65500.0f;
+	float32_t ring = 65536.0f / 10.0f;
 	float32_t thetaEvery = 2.0f * 3.141592653589793f / ring;
 	float32_t theta = float32_t(DTid.x) * thetaEvery;
-	float32_t dis = float32_t(DTid.x) / 1024 * 0.1f;
+
+	uint32_t a = DTid.x / (65536 / 10);
+
+	float32_t dis = 0.2f * float32_t(a);
 	float32_t s = sin(theta);
 	float32_t c = cos(theta);
 	float32_t initSpeed = 0.01f;
