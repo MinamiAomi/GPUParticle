@@ -204,7 +204,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 			// 更新
 			{
-
 				ImGui::DragFloat3("Camera pos", &position.x, 0.1f);
 				ImGui::DragFloat3("CameraRotate", &euler.x, 0.01f, 0.0f, Math::Pi * 2.0f);
 				rotate = Quaternion::MakeFromEulerAngle(euler);

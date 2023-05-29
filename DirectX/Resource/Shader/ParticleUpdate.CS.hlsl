@@ -10,10 +10,11 @@ void main(uint32_t3 DTid : SV_DispatchThreadID) {
 	float32_t distance = length(direction);
 	direction = direction / distance;
 	if (distance <= 1.0f) {
-	//	direction *= -1.0f;
-		//particlesRWSB[DTid.x].velocity *= -1.0f;
+		//	direction *= -1.0f;
+			//particlesRWSB[DTid.x].velocity *= -1.0f
 	}
 
+	
 
 	particlesRWSB[DTid.x].acceleration = direction * 0.001f;
 	particlesRWSB[DTid.x].velocity += particlesRWSB[DTid.x].acceleration;

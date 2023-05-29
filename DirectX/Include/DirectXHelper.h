@@ -391,3 +391,67 @@ namespace DirectXHelper {
 #pragma endregion 構造化バッファ
 };
 
+#define ASSERT_HRESULT(hr) { if(FAILED(hr)) assert(false); }
+
+namespace DX12Wrapper {
+	template<class T>
+	using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+	class Core {
+	public:
+		void Initalize();
+		
+		ID3D12Device* GetDevice() const { return device_.Get(); }
+		ComPtr<ID3D12Device5> GetDeviceComPtr() const { return device_; }
+		IDXGIFactory6* GetFactory() const { return factory_.Get(); }
+		ComPtr<IDXGIFactory6> GetFactoryComPtr() const { return factory_; }
+
+	private:
+		ComPtr<ID3D12Device5> device_;
+		ComPtr<IDXGIFactory6> factory_;
+	};
+
+	class CommandList {
+
+		ID3D12GraphicsCommandList4* cmdList_;
+	};
+
+	enum class ResourceState {
+		Common = D3D12_RESOURCE_STATE_COMMON,
+		VertexAndConstantBuffer = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
+		IndexBuffer = D3D12_RESOURCE_STATE_INDEX_BUFFER,
+		RenderTarget = D3D12_RESOURCE_STATE_RENDER_TARGET,
+		UnorderedAccess = D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+		DepthWrite = D3D12_RESOURCE_STATE_DEPTH_WRITE,
+		DepthRead = D3D12_RESOURCE_STATE_DEPTH_READ,
+		NonPixelShaderResource = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE,
+		PixelShaderResource = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+		StreamOut = D3D12_RESOURCE_STATE_STREAM_OUT,
+		IndirectArgument = D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT,
+		CopyDest = D3D12_RESOURCE_STATE_COPY_DEST,
+		CopySource = D3D12_RESOURCE_STATE_COPY_SOURCE,
+		ResolveDest = D3D12_RESOURCE_STATE_RESOLVE_DEST,
+		ResolveSource = D3D12_RESOURCE_STATE_RESOLVE_SOURCE,
+		RaytracingAccelerationStructure = D3D12_RESOURCE_STATE_RAYTRACING_ACCELERATION_STRUCTURE,
+		ShadingRateSource = D3D12_RESOURCE_STATE_SHADING_RATE_SOURCE,
+		GenericRead = D3D12_RESOURCE_STATE_GENERIC_READ,
+		AllShaderResource = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE,
+		Present = D3D12_RESOURCE_STATE_PRESENT,
+		Predication = D3D12_RESOURCE_STATE_PREDICATION,
+		VideoDecodeRead = D3D12_RESOURCE_STATE_VIDEO_DECODE_READ,
+		VideoDecodeWrite = D3D12_RESOURCE_STATE_VIDEO_DECODE_WRITE,
+		VideoProcessRead = D3D12_RESOURCE_STATE_VIDEO_PROCESS_READ,
+		VideoProcessWrite = D3D12_RESOURCE_STATE_VIDEO_PROCESS_WRITE,
+		VideoEncodeRead = D3D12_RESOURCE_STATE_VIDEO_ENCODE_READ,
+		VideoEncodeWrite = D3D12_RESOURCE_STATE_VIDEO_ENCODE_WRITE
+	};
+
+	class GPUResource {
+	public:
+		void UAVBarrier();
+
+	private:
+		ComPtr<ID3D12Resource> resource_;
+		D3D12_RESOURCE_STATES state_;
+	};
+}
