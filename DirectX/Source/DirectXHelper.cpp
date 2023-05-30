@@ -254,7 +254,7 @@ namespace DirectXHelper {
 		inputElement.InstanceDataStepRate = instanceDataStepRate;
 	}
 
-	void GraphicsPipelineStateDesc::SetPrimitiveTopologyType(PrimitiveTopologyType primitiveTopologyType) {
+	void GraphicsPipelineStateDesc::SetPrimitiveTopologyType(PrimitiveTopology primitiveTopologyType) {
 		desc_.PrimitiveTopologyType = static_cast<D3D12_PRIMITIVE_TOPOLOGY_TYPE>(primitiveTopologyType);
 	}
 

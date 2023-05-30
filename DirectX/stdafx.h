@@ -22,6 +22,7 @@
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include <dinput.h>
+#define NOMINMAX
 #include <Windows.h>
 #include <wrl.h>
 

@@ -202,7 +202,7 @@ namespace DirectXHelper {
 			Always = D3D12_COMPARISON_FUNC_ALWAYS				// 比較を渡す
 		};
 		// プリミティブ型
-		enum class PrimitiveTopologyType {
+		enum class PrimitiveTopology {
 			Point = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT,		// 点
 			Line = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE,			// 線
 			Triangle = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE	// 三角形
@@ -217,7 +217,7 @@ namespace DirectXHelper {
 		void SetRasterizerState(FillMode fillMode, CullMode cullMode);
 		void AddInputElementVertex(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t inputSlot);
 		void AddInputElementInstance(const std::string& semanticName, uint32_t semanticIndex, DXGI_FORMAT format, uint32_t inputSlot, uint32_t instanceDataStepRate);
-		void SetPrimitiveTopologyType(PrimitiveTopologyType primitiveTopologyType);
+		void SetPrimitiveTopologyType(PrimitiveTopology primitiveTopologyType);
 		void AddRenderTargetState(BlendMode blendMode, DXGI_FORMAT rtvFormat);
 		void SetDepthState(DepthWriteMask depthWriteMask, ComparisonFunc comparisonFunc, DXGI_FORMAT dsvFormat);
 		void SetSampleState(uint32_t count, uint32_t quality);
@@ -394,28 +394,6 @@ namespace DirectXHelper {
 #define ASSERT_HRESULT(hr) { if(FAILED(hr)) assert(false); }
 
 namespace DX12Wrapper {
-	template<class T>
-	using ComPtr = Microsoft::WRL::ComPtr<T>;
-
-	class Core {
-	public:
-		void Initalize();
-		
-		ID3D12Device* GetDevice() const { return device_.Get(); }
-		ComPtr<ID3D12Device5> GetDeviceComPtr() const { return device_; }
-		IDXGIFactory6* GetFactory() const { return factory_.Get(); }
-		ComPtr<IDXGIFactory6> GetFactoryComPtr() const { return factory_; }
-
-	private:
-		ComPtr<ID3D12Device5> device_;
-		ComPtr<IDXGIFactory6> factory_;
-	};
-
-	class CommandList {
-
-		ID3D12GraphicsCommandList4* cmdList_;
-	};
-
 	enum class ResourceState {
 		Common = D3D12_RESOURCE_STATE_COMMON,
 		VertexAndConstantBuffer = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,
@@ -444,14 +422,5 @@ namespace DX12Wrapper {
 		VideoProcessWrite = D3D12_RESOURCE_STATE_VIDEO_PROCESS_WRITE,
 		VideoEncodeRead = D3D12_RESOURCE_STATE_VIDEO_ENCODE_READ,
 		VideoEncodeWrite = D3D12_RESOURCE_STATE_VIDEO_ENCODE_WRITE
-	};
-
-	class GPUResource {
-	public:
-		void UAVBarrier();
-
-	private:
-		ComPtr<ID3D12Resource> resource_;
-		D3D12_RESOURCE_STATES state_;
 	};
 }

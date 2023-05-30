@@ -80,6 +80,9 @@
     <ClCompile Include="Input.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="DX12Core.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Debug.h">
@@ -150,6 +153,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12Core.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

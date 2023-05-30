@@ -106,7 +106,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		using RangeType = DirectXHelper::RootSignatureDesc::RangeType;
 		using FillMode = DirectXHelper::GraphicsPipelineStateDesc::FillMode;
 		using CullMode = DirectXHelper::GraphicsPipelineStateDesc::CullMode;
-		using PrimitiveTopologyType = DirectXHelper::GraphicsPipelineStateDesc::PrimitiveTopologyType;
+		using PrimitiveTopologyType = DirectXHelper::GraphicsPipelineStateDesc::PrimitiveTopology;
 		using BlendMode = DirectXHelper::GraphicsPipelineStateDesc::BlendMode;
 		using DepthWriteMask = DirectXHelper::GraphicsPipelineStateDesc::DepthWriteMask;
 		using ComparisonFunc = DirectXHelper::GraphicsPipelineStateDesc::ComparisonFunc;
@@ -129,7 +129,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		psDesc.SetGeometryShader(gs->GetBufferPointer(), gs->GetBufferSize());
 		psDesc.AddInputElementVertex("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0);
 		psDesc.SetRasterizerState(FillMode::Solid, CullMode::Back);
-		psDesc.SetPrimitiveTopologyType(PrimitiveTopologyType::Point);
+		psDesc.SetPrimitiveTopologyType(PrimitiveTopology::Point);
 		psDesc.AddRenderTargetState(BlendMode::Add, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 		psDesc.SetSampleState(1, 0);
 		pso.Create(directXDevice.GetDevice(), psDesc);
