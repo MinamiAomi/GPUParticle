@@ -15,7 +15,7 @@ private:
 	DirectXHelper::ComPtr<IDirectInputDevice8> mouse_;
 	struct MouseState {
 		DIMOUSESTATE2 state;
-		Math::Vector2 screenPos;
+		Vector2 screenPos;
 	};
 	MouseState curMouseState_{};
 	MouseState preMouseState_{};

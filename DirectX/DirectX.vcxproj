@@ -110,7 +110,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>$(SolutionDir)Externals\DirectX;$(SolutionDir)Externals\imgui;$(ProjectDir);$(ProjectDir)Include;$(IncludePath)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -150,10 +150,20 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="..\Externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\Externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="DX12Core.cpp" />
-    <ClCompile Include="GPUParticle.cpp" />
+    <ClCompile Include="CommandList.cpp" />
+    <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="Fence.cpp" />
+    <ClCompile Include="GPUResource.cpp" />
+    <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="IndexBuffer.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Matrix4x4.cpp" />
+    <ClCompile Include="PipelineState.cpp" />
+    <ClCompile Include="Quaternion.cpp" />
+    <ClCompile Include="RenderTarget.cpp" />
+    <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="Source\Debug.cpp" />
     <ClCompile Include="Source\DirectXDevice.cpp" />
     <ClCompile Include="Source\DirectXHelper.cpp" />
@@ -164,6 +174,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="StructuredBuffer.cpp" />
+    <ClCompile Include="Vector2.cpp" />
+    <ClCompile Include="Vector3.cpp" />
+    <ClCompile Include="Vector4.cpp" />
+    <ClCompile Include="VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Externals\DirectX\d3dx12.h" />
@@ -176,8 +191,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="..\Externals\imgui\imstb_textedit.h" />
     <ClInclude Include="..\Externals\imgui\imstb_truetype.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="DX12Core.h" />
-    <ClInclude Include="GPUParticle.h" />
+    <ClInclude Include="CommandList.h" />
+    <ClInclude Include="ConstantBuffer.h" />
+    <ClInclude Include="Fence.h" />
+    <ClInclude Include="GPUResource.h" />
+    <ClInclude Include="Graphics.h" />
+    <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="Include\Debug.h" />
     <ClInclude Include="Include\DirectXDevice.h" />
     <ClInclude Include="Include\DirectXHelper.h" />
@@ -187,16 +207,33 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Include\StringUtils.h" />
     <ClInclude Include="Include\Window.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Matrix4x4.h" />
+    <ClInclude Include="Matrix4x4_inline.h" />
+    <ClInclude Include="PipelineState.h" />
+    <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="Quaternion_inline.h" />
+    <ClInclude Include="RenderTarget.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Resource\Shader\HLSLCompat.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Resource\Shader\ParticleCompute_HLSLCompat.h" />
     <ClInclude Include="Resource\Shader\ParticleGraphics_HLSLCompat.h" />
+    <ClInclude Include="RootSignature.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="StructuredBuffer.h" />
+    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="Vector2_inline.h" />
+    <ClInclude Include="Vector3.h" />
+    <ClInclude Include="Vector3_inline.h" />
+    <ClInclude Include="Vector4.h" />
+    <ClInclude Include="Vector4_inline.h" />
+    <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Externals\imgui\LICENSE.txt" />
+    <Text Include="Log.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\Shader\ParticleGraphics_PS.hlsl">
@@ -233,6 +270,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DirectX.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

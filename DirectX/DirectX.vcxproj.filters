@@ -25,12 +25,18 @@
     <Filter Include="Externals\DirectX">
       <UniqueIdentifier>{8072b7f1-6734-4fb1-852b-402f78b47a7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DirectX">
+      <UniqueIdentifier>{a6029c18-3a96-448f-a4eb-1e758cb8e286}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Output">
+      <UniqueIdentifier>{12035a81-c7ee-4222-ab0b-e7fe9809e43e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{ceaf6fd1-dd38-48c4-9079-9b84d0588c16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Debug.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\DirectXHelper.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Window.cpp">
@@ -42,12 +48,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\ShaderCompiler.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\MathUtils.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\DirectXDevice.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Externals\imgui\imgui.cpp">
@@ -71,24 +71,75 @@
     <ClCompile Include="..\Externals\imgui\imgui_widgets.cpp">
       <Filter>Externals\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="GPUParticle.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="DX12Core.cpp">
+    <ClCompile Include="Source\DirectXHelper.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DirectXDevice.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Fence.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandList.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="RootSignature.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineState.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="GPUResource.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="StructuredBuffer.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTarget.cpp">
+      <Filter>DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector2.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MathUtils.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Quaternion.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix4x4.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Debug.h">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\DirectXHelper.h">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Include\Window.h">
@@ -99,12 +150,6 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Include\ShaderCompiler.h">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\MathUtils.h">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\DirectXDevice.h">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\Externals\imgui\imconfig.h">
@@ -143,25 +188,100 @@
     <ClInclude Include="Resource\Shader\HLSLCompat.h">
       <Filter>Resource\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="GPUParticle.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\MathUtils_inline.h">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="DX12Core.h">
+    <ClInclude Include="Include\DirectXDevice.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\DirectXHelper.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Fence.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandList.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="RootSignature.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineState.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUResource.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBuffer.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="StructuredBuffer.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTarget.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2_inline.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3_inline.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\MathUtils.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\MathUtils_inline.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector4_inline.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternion_inline.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix4x4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix4x4_inline.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Externals\imgui\LICENSE.txt">
       <Filter>Externals\imgui</Filter>
+    </Text>
+    <Text Include="Log.txt">
+      <Filter>Output</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
@@ -180,5 +300,10 @@
     <None Include="Resource\Shader\ParticleInitalize.CS.hlsl">
       <Filter>Resource\Shader</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DirectX.rc">
+      <Filter>Resource</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

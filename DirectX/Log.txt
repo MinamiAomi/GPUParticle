@@ -1,0 +1,2 @@
+Info      : Use adapter NVIDIA GeForce RTX 3060
+Info      : FeatureLevel 12.1

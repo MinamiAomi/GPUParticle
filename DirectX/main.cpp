@@ -1,3 +1,5 @@
+
+#if 0
 #include "Window.h"
 #include "DirectXDevice.h"
 #include "ShaderCompiler.h"
@@ -233,3 +235,27 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	return 0;
 }
+
+#else
+
+#include "Window.h"
+#include "Graphics.h"
+#include "CommandList.h"
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "Quaternion.h"
+#include "Matrix4x4.h"
+
+int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
+
+	Engine::graphics.Initalize();
+
+	
+
+
+	return 0;
+}
+
+
+#endif

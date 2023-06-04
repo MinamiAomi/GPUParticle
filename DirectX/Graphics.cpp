@@ -1,20 +1,16 @@
-#include "stdafx.h"
-#include "DX12Core.h"
+#include "Graphics.h"
+#include "Logger.h"
+#include "StringUtils.h"
 
-namespace DirectXHelper {
-	template<class T>
-	using ComPtr = Microsoft::WRL::ComPtr<T>;
+namespace Engine {
 
-	Core* DirectXHelper::Core::GetInstance() {
-		static Core instance;
+	Graphics* Graphics::GetInstance() {
+		static Graphics instance;
 		return &instance;
 	}
 
-	bool Core::Initalize() {
-		return GetInstance()->InternalInitalize();
-	}
+	bool Graphics::Initalize() {
 
-	bool Core::InternalInitalize() {
 #ifdef _DEBUG	
 		// デバッグ時のみ
 		ComPtr<ID3D12Debug1> debugController;
@@ -27,7 +23,8 @@ namespace DirectXHelper {
 #endif
 
 		if (FAILED(CreateDXGIFactory(IID_PPV_ARGS(factory_.GetAddressOf())))) {
-			OutputDebugStringA("FAILED!! : Create DXGIFactory\n");
+			Logger::Error("CreateDXGIFactory()");
+			assert(false);
 			return false;
 		}
 
@@ -41,22 +38,24 @@ namespace DirectXHelper {
 			// アダプター情報を取得
 			DXGI_ADAPTER_DESC3 adapterDesc{};
 			if (FAILED(useAdapter->GetDesc3(&adapterDesc))) {
-				OutputDebugStringA("FAILED!! : Get adapter desc3\n");
+				Logger::Error("IDXGIAdapter4::GetDesc3()");
+				assert(false);
+				return false;
 			}
 
 			// ソフトウェアアダプタでなければ採用
 			if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)) {
 				// 採用したアダプタ情報を出力
-				OutputDebugStringW(std::format(L"Use Adapter:{}\n", adapterDesc.Description).c_str());
+				Logger::Info(std::format("Use adapter {}", String::Convert(adapterDesc.Description)));
 				break;
 			}
 			useAdapter = nullptr; // ソフトウェアアダプタは見なかったことにする
 		}
 		if (!useAdapter) {
-			OutputDebugStringA("FAILED!! : Use adapter null\n");
+			Logger::Error("DXGIAdapter not found");
+			assert(false);
 			return false;
 		}
-		useAdapter.As(&adapter_);
 
 		// 機能レベルとログ出力用の文字列
 		D3D_FEATURE_LEVEL featureLevels[] = {
@@ -69,12 +68,12 @@ namespace DirectXHelper {
 			// 指定した機能レベルでデバイスが生成できたかを確認
 			if (SUCCEEDED(D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(device_.GetAddressOf())))) {
 				// 生成できたのでログ出力を行ってループを抜ける
-				OutputDebugStringA(std::format("FeatureLevel : {}\n", featureLevelStrings[i]).c_str());
+				Logger::Info(std::format("FeatureLevel {}", featureLevelStrings[i]));
 				break;
 			}
 		}
 		if (!device_) {
-			OutputDebugStringA("FAILED!! : Create device\n");
+			Logger::Error("CreateDevice()");
 			return false;
 		}
 

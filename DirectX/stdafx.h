@@ -10,6 +10,7 @@
 #include <array>
 #include <format>
 #include <functional>
+#include <fstream>
 #include <list>
 #include <iomanip>
 #include <memory>
@@ -22,8 +23,9 @@
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include <dinput.h>
-#define NOMINMAX
 #include <Windows.h>
+#undef min
+#undef max
 #include <wrl.h>
 
 // Externals
