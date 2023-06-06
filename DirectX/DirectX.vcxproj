@@ -190,6 +190,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="..\Externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\Externals\imgui\imstb_textedit.h" />
     <ClInclude Include="..\Externals\imgui\imstb_truetype.h" />
+    <ClInclude Include="Assert.h" />
+    <ClInclude Include="Bitset.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CommandList.h" />
     <ClInclude Include="ConstantBuffer.h" />

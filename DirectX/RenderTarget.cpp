@@ -3,19 +3,32 @@
 #include "Logger.h"
 
 namespace DirectXHelper {
-	bool RenderTarget::Initalize(ID3D12Device5* device, ID3D12Resource* resource, DXGI_FORMAT viewFormat) {
-		assert(device);
-		assert(resource);
 
+	D3D12_CPU_DESCRIPTOR_HANDLE RenderTarget::sStartHandle_{};
+	ComPtr<ID3D12DescriptorHeap> RenderTarget::sDescriptorHeap_;
+	Engine::Bitset<kRTVMaxCount> RenderTarget::sUseTable_;
+	uint32_t RenderTarget::sDescriptorSize_{ 0 };
+
+	bool RenderTarget::CreateHeap(ID3D12Device5* device) {
 		D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc{};
 		descriptorHeapDesc.NumDescriptors = 1;
 		descriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-		if (FAILED(device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(descriptorHeap_.ReleaseAndGetAddressOf())))) {
+		if (FAILED(device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(sDescriptorHeap_.GetAddressOf())))) {
 			Logger::Error("CreateDescriptorHeap()");
 			assert(false);
 			return false;
 		}
-		handle_ = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+		sDescriptorSize_ = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		sStartHandle_ = sDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+		sUseTable_.Reset();
+		return true;
+	}
+
+	bool RenderTarget::Initalize(ID3D12Device5* device, ID3D12Resource* resource, DXGI_FORMAT viewFormat) {
+		assert(device);
+		assert(resource);
+
+
 		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
 		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 		rtvDesc.Format = viewFormat;
@@ -55,7 +68,7 @@ namespace DirectXHelper {
 			return false;
 		}
 
-		return Initalize(device, tmpResource,format);
+		return Initalize(device, tmpResource, format);
 	}
 
 }

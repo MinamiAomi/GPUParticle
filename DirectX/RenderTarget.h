@@ -1,11 +1,22 @@
 #pragma once
 #include "GPUResource.h"
+#include "Bitset.h"
 
 namespace DirectXHelper {
 	using namespace Microsoft::WRL;
 
 	class RenderTarget :
 		public GPUResource {
+	private:
+		static constexpr uint32_t kRTVMaxCount = 16;
+
+		static bool CreateHeap(ID3D12Device5* device);
+
+		static D3D12_CPU_DESCRIPTOR_HANDLE sStartHandle_;
+		static ComPtr<ID3D12DescriptorHeap> sDescriptorHeap_;
+		static Engine::Bitset<kRTVMaxCount> sUseTable_;
+		static uint32_t sDescriptorSize_;
+		
 	public:
 		bool Initalize(ID3D12Device5* device, ID3D12Resource* resource, DXGI_FORMAT viewFormat);
 		bool Initalize(ID3D12Device5* device, uint32_t width, uint32_t height, DXGI_FORMAT format, float clearColor[4]);

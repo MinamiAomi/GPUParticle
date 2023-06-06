@@ -275,6 +275,12 @@
     <ClInclude Include="Matrix4x4_inline.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="Assert.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Bitset.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Externals\imgui\LICENSE.txt">
